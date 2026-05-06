@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Análisis de Pedidos</title>
+</head>
+<body>
+    <h1>Analizador de Comercio Electrónico</h1>
+    <textarea id="inputCaso" rows="5" cols="50" placeholder="Pegue aquí el caso de prueba..."></textarea><br>
+    <button onclick="procesar()">Calcular</button>
+    <h3>Resultado:</h3>
+    <pre id="output"></pre>
+
+    <script src="util.js"></script>
+    <script>
+        function procesar() {
+            const entrada = document.getElementById('inputCaso').value;
+            const resultado = calcularPedidos(entrada);
+            document.getElementById('output').innerText = resultado;
+        }
+    </script>
+</body>
+</html>
