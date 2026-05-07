@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0d14">
+  <meta name="description" content="Conoce a tus mejores clientes — Análisis simple para tu tienda online">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>Mi Tienda — Conoce a tus mejores clientes</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="./css/inicio.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">🛍️</div>
+      <div>
+        <h1>Mi Tienda</h1>
+        <div class="subtitle">Conoce a tus mejores clientes</div>
+      </div>
+    </div>
+    <span class="spacer"></span>
+    <a href="./index.html" class="icon-btn" title="Modo desarrollador" aria-label="Modo desarrollador">⚙️</a>
+    <button id="btnTheme" class="icon-btn" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
+  </header>
+
+  <!-- ============================================================
+                          HERO / WIZARD STEPS
+  ============================================================ -->
+  <main>
+
+    <!-- PASO 1: Bienvenida -->
+    <section id="step-welcome" class="step active">
+      <div class="hero">
+        <div class="hero-badge">📊 Análisis simple en 3 clicks</div>
+        <h1 class="hero-title">
+          Descubre <span class="grad">quiénes</span> son
+          <span class="grad">tus mejores clientes</span>
+        </h1>
+        <p class="hero-sub">
+          Sube las ventas de tu tienda y te mostramos en segundos quiénes te
+          generan más ingresos, qué categorías son tus estrellas y a quién
+          deberías premiar para que vuelva a comprar.
+        </p>
+        <div class="hero-actions">
+          <button class="primary big" id="ctaStart">🚀 Empezar ahora</button>
+          <button class="secondary big" id="ctaDemo">👀 Ver con datos de ejemplo</button>
+        </div>
+
+        <div class="features">
+          <div class="feature">
+            <span class="ico">⚡</span>
+            <h4>Resultados al instante</h4>
+            <p>Análisis local en tu navegador, sin esperas ni servidores.</p>
+          </div>
+          <div class="feature">
+            <span class="ico">🔒</span>
+            <h4>Tus datos no salen de aquí</h4>
+            <p>Todo se procesa en tu dispositivo. Cero envío a la nube.</p>
+          </div>
+          <div class="feature">
+            <span class="ico">📱</span>
+            <h4>Funciona en el celular</h4>
+            <p>Instálala como app desde Chrome y úsala incluso sin internet.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 2: Cargar datos -->
+    <section id="step-upload" class="step">
+      <div class="step-header">
+        <span class="step-num">Paso 1 de 2</span>
+        <h2>Trae los datos de tus ventas</h2>
+        <p>Elige cómo quieres empezar. La opción más rápida es probar con datos de ejemplo.</p>
+      </div>
+
+      <div class="choices">
+        <button class="choice-card" id="choiceDemo">
+          <div class="choice-icon">🎯</div>
+          <h3>Probar con datos de ejemplo</h3>
+          <p>Empieza con la "Tienda Demo": 5.000 ventas reales sintéticas.</p>
+          <span class="choice-cta">Ver ejemplo →</span>
+        </button>
+
+        <label class="choice-card" id="choiceUpload">
+          <div class="choice-icon">📁</div>
+          <h3>Subir mi archivo CSV</h3>
+          <p>Cabecera esperada: <code>customer,product,category,price,quantity,timestamp</code>.</p>
+          <span class="choice-cta">Seleccionar archivo →</span>
+          <input type="file" id="fileInput" accept=".csv,.txt" hidden>
+        </label>
+
+        <button class="choice-card" id="choicePaste">
+          <div class="choice-icon">📋</div>
+          <h3>Pegar mis ventas a mano</h3>
+          <p>Si tienes una lista de ventas, pégala con el formato del enunciado.</p>
+          <span class="choice-cta">Pegar texto →</span>
+        </button>
+      </div>
+
+      <div id="pasteArea" class="paste-area" hidden>
+        <label>Pega tus records (separados por <code>;</code>)</label>
+        <textarea id="pasteInput" placeholder="Customer1 Laptop Technology 3000 1 10;..."></textarea>
+        <div class="actions">
+          <button class="primary" id="btnUsePaste">▶ Continuar</button>
+          <button class="ghost" id="btnCancelPaste">Cancelar</button>
+        </div>
+      </div>
+
+      <div class="back-link">
+        <button class="ghost" data-goto="welcome">← Volver al inicio</button>
+      </div>
+    </section>
+
+    <!-- PASO 3: Resultados -->
+    <section id="step-results" class="step">
+      <div class="results-header">
+        <div>
+          <span class="step-num">Tus resultados</span>
+          <h2 id="resultsTitle">Análisis de tu tienda</h2>
+          <p id="resultsSubtitle"></p>
+        </div>
+        <div class="results-actions">
+          <button class="secondary" id="btnNewAnalysis">🔄 Nuevo análisis</button>
+          <button class="primary" id="btnDownloadReport">⬇ Descargar reporte</button>
+        </div>
+      </div>
+
+      <!-- Big numbers -->
+      <div class="big-numbers"></div>
+
+      <!-- Top customers -->
+      <div class="card">
+        <div class="card-header">
+          <h2>🏆 Tus mejores clientes</h2>
+          <span class="card-action" id="exportCsvUser">⬇ Exportar a CSV</span>
+        </div>
+        <div id="topCustomers" class="customers-grid"></div>
+      </div>
+
+      <!-- Insights -->
+      <div class="card">
+        <div class="card-header"><h2>💡 Lo que descubrimos</h2></div>
+        <div id="insights" class="insights-list"></div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="card">
+        <div class="card-header"><h2>🎯 Qué hacer ahora</h2></div>
+        <div id="recommendations" class="recommendations"></div>
+      </div>
+
+      <!-- Charts -->
+      <div class="card">
+        <div class="card-header"><h2>📈 ¿De dónde vienen tus ingresos?</h2></div>
+        <div class="chart-wrap"><canvas id="catChartUser"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>📊 Top clientes por gasto</h2></div>
+        <div class="chart-wrap"><canvas id="topChartUser"></canvas></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Hecha con ❤️ para EDyA1 · UAO 2026-1 ·
+    <a href="./index.html">Modo desarrollador</a>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+  <script src="./js/algoritmos.js"></script>
+  <script src="./js/parser.js"></script>
+  <script src="./js/util.js"></script>
+  <script src="./js/generador.js"></script>
+  <script src="./js/inicio.js"></script>
+</body>
+</html>

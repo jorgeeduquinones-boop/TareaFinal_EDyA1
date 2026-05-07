@@ -2,7 +2,7 @@
   "name": "E-Commerce Analytics — EDyA1",
   "short_name": "Pedidos EDyA1",
   "description": "Análisis de Pedidos en Comercio Electrónico — Tarea Final EDyA1, UAO 2026-1",
-  "start_url": "./index.html",
+  "start_url": "./inicio.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
