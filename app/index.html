@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0f17">
+  <meta name="description" content="Análisis de Pedidos en Comercio Electrónico — Tarea Final EDyA1, UAO 2026-1">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <title>E-Commerce Analytics — EDyA1</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>📊 E-Commerce Analytics</h1>
+    <span class="badge">EDyA1 · UAO</span>
+    <span class="spacer"></span>
+    <button id="btnInstall" class="install">Instalar app</button>
+  </header>
+
+  <main>
+    <div class="tabs">
+      <button class="active" data-panel="analisis">Análisis</button>
+      <button data-panel="datos">Datos</button>
+      <button data-panel="bench">Benchmark</button>
+      <button data-panel="tests">Tests</button>
+      <button data-panel="info">Info</button>
+    </div>
+
+    <!-- ========================= ANÁLISIS ========================= -->
+    <section id="panel-analisis" class="panel active">
+      <div id="metrics" class="metrics"></div>
+
+      <div class="card">
+        <h2>Ranking de clientes</h2>
+        <div id="rankingTabla"></div>
+      </div>
+
+      <div class="card">
+        <h2>Top clientes por gasto</h2>
+        <canvas id="chartCanvas"></canvas>
+      </div>
+
+      <div class="card">
+        <h2>Salida cruda (formato del enunciado)</h2>
+        <pre id="output" class="output"></pre>
+      </div>
+    </section>
+
+    <!-- ========================= DATOS ========================= -->
+    <section id="panel-datos" class="panel">
+      <div class="card">
+        <h2>Caso de entrada</h2>
+        <label for="inputCaso">Pegue el caso (records separados por <code>;</code>)</label>
+        <textarea id="inputCaso" placeholder="customer1 producto1 categoria1 precio cantidad timestamp;..."></textarea>
+        <div class="actions">
+          <button class="primary" id="btnAnalizar">Analizar</button>
+          <button class="secondary" id="btnEjemplo">Cargar ejemplo del PDF</button>
+          <label class="secondary" style="padding:10px 16px; border-radius:8px; cursor:pointer;">
+            Cargar CSV<input type="file" id="inputCsv" accept=".csv,.txt" hidden>
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Generar caso sintético</h2>
+        <div class="row">
+          <div><label>m (records)</label><input type="number" id="paramM" value="5000" min="1"></div>
+          <div><label>n (clientes)</label><input type="number" id="paramN" value="50" min="1"></div>
+          <div><label>p (categorías)</label><input type="number" id="paramP" value="5" min="1" max="10"></div>
+          <div><label>seed</label><input type="number" id="paramSeed" value="42"></div>
+        </div>
+        <div class="actions">
+          <button class="primary" id="btnGenerar">Generar</button>
+        </div>
+        <p id="genInfo" style="font-size:12px; color:var(--text-dim); margin-top:8px;"></p>
+      </div>
+    </section>
+
+    <!-- ========================= BENCHMARK ========================= -->
+    <section id="panel-bench" class="panel">
+      <div class="card">
+        <h2>Comparación de algoritmos de ordenamiento</h2>
+        <p style="color:var(--text-dim); font-size:12px;">
+          Mide la fase de ordenamiento aislada del parseo. Todos los algoritmos
+          son implementaciones propias excepto <code>Array.sort</code> (V8) que
+          se incluye como referencia.
+        </p>
+        <div class="row">
+          <div><label>m</label><input type="number" id="benchM" value="20000"></div>
+          <div><label>n</label><input type="number" id="benchN" value="500"></div>
+          <div><label>p</label><input type="number" id="benchP" value="8"></div>
+        </div>
+        <div class="actions">
+          <button class="primary" id="btnBench">Correr benchmark</button>
+        </div>
+        <div id="benchResultados" style="margin-top:14px;"></div>
+      </div>
+    </section>
+
+    <!-- ========================= TESTS ========================= -->
+    <section id="panel-tests" class="panel">
+      <div class="card">
+        <h2>Suite de tests automatizados</h2>
+        <p style="color:var(--text-dim); font-size:12px;">
+          Verifica correctitud sobre el ejemplo del PDF, casos de empate,
+          robustez frente a entrada mal formada y volumen alto.
+        </p>
+        <div class="actions">
+          <button class="primary" id="btnTests">Correr tests</button>
+        </div>
+        <div id="testResultados" style="margin-top:14px;"></div>
+      </div>
+    </section>
+
+    <!-- ========================= INFO ========================= -->
+    <section id="panel-info" class="panel">
+      <div class="card">
+        <h2>Sobre el proyecto</h2>
+        <p>
+          App web (instalable como PWA) para resolver la <strong>Tarea Final de
+          Estructuras de Datos y Algoritmos 1</strong> — UAO 2026-1, profesor
+          Orlando Arboleda Molina. Implementa <code>calcularPedidos(caso)</code>
+          en <code>util.js</code> con algoritmos de ordenamiento propios y
+          análisis empírico de eficiencia.
+        </p>
+      </div>
+      <div class="card">
+        <h2>Análisis de complejidad</h2>
+        <p style="font-size:13px;">
+          Sea <em>m</em> = #records, <em>n</em> = #customers, <em>p</em> = #categorías,
+          <em>k</em> = longitud media de un campo.
+        </p>
+        <table style="font-size:12px;">
+          <thead><tr><th>Fragmento</th><th>Complejidad</th></tr></thead>
+          <tbody>
+            <tr><td>Parseo del caso</td><td>O(m·k)</td></tr>
+            <tr><td>Acumulación por cliente (Map)</td><td>O(m)</td></tr>
+            <tr><td>Cálculo de favoriteCategory</td><td>O(n·p)</td></tr>
+            <tr><td>MergeSort estable multi-criterio</td><td>O(n log n)</td></tr>
+            <tr><td>Formateo de salida</td><td>O(n·k)</td></tr>
+            <tr><td><strong>TOTAL</strong></td><td><strong>O(m·k + n·p + n log n)</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Algoritmos implementados</h2>
+        <ul style="font-size:13px; line-height:1.7;">
+          <li><strong>MergeSort bottom-up estable</strong> — usado en producción para ordenar el ranking final.</li>
+          <li><strong>QuickSort 3-way</strong> con pivote aleatorio — comparativo.</li>
+          <li><strong>RadixSort LSD base 256</strong> sobre <code>totalSpent</code> — demostrativo.</li>
+          <li><strong>Insertion Sort</strong> — baseline didáctico.</li>
+          <li>Comparador multi-criterio y comparación lexicográfica de strings sin <code>localeCompare</code>.</li>
+          <li>Parser carácter a carácter sin <code>String.split</code>.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Tarea Final EDyA1 — UAO 2026-1 · Disponible offline (PWA)
+  </footer>
+
+  <!-- Chart.js CDN para visualizaciones -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+  <script src="./js/algoritmos.js"></script>
+  <script src="./js/parser.js"></script>
+  <script src="./js/util.js"></script>
+  <script src="./js/generador.js"></script>
+  <script src="./js/benchmark.js"></script>
+  <script src="./js/tests.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

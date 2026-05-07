@@ -1,0 +1,156 @@
+/* =========================================================================
+   styles.css — Dashboard E-Commerce Analytics
+   Mobile-first, dark theme, sin frameworks externos.
+   ========================================================================= */
+
+:root {
+  --bg: #0b0f17;
+  --bg-2: #131a26;
+  --bg-3: #1a2334;
+  --border: #243049;
+  --text: #e6ecf5;
+  --text-dim: #9aa7bd;
+  --accent: #4f8cff;
+  --accent-2: #7c5cff;
+  --good: #2dd4bf;
+  --warn: #f5b651;
+  --bad: #ef4f6b;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+header {
+  position: sticky; top: 0; z-index: 10;
+  background: linear-gradient(180deg, var(--bg-2), rgba(19, 26, 38, 0.92));
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+header h1 {
+  font-size: 16px; margin: 0; font-weight: 600;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+header .badge {
+  font-size: 11px; color: var(--text-dim);
+  border: 1px solid var(--border); padding: 2px 8px; border-radius: 999px;
+}
+header .spacer { flex: 1; }
+header button.install {
+  font-size: 12px; padding: 6px 12px; border-radius: 8px;
+  background: var(--accent); color: white; border: none; cursor: pointer;
+  display: none;
+}
+header button.install.show { display: inline-block; }
+
+main { padding: 16px; max-width: 1100px; margin: 0 auto; }
+
+.tabs {
+  display: flex; gap: 6px; margin-bottom: 14px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 4px;
+  overflow-x: auto;
+}
+.tabs button {
+  flex: 1; min-width: 90px;
+  padding: 8px 10px; border: none; background: transparent;
+  color: var(--text-dim); font-size: 13px; font-weight: 500;
+  border-radius: 8px; cursor: pointer; white-space: nowrap;
+}
+.tabs button.active { background: var(--bg-3); color: var(--text); }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.card h2 {
+  margin: 0 0 12px 0; font-size: 14px; font-weight: 600;
+  color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+textarea, input[type="number"], input[type="text"] {
+  width: 100%; box-sizing: border-box;
+  background: var(--bg-3); border: 1px solid var(--border); color: var(--text);
+  padding: 10px 12px; border-radius: 8px; font-family: ui-monospace, "SF Mono", Monaco, Consolas, monospace;
+  font-size: 13px; outline: none;
+}
+textarea:focus, input:focus { border-color: var(--accent); }
+textarea { min-height: 110px; resize: vertical; }
+
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 100px; }
+
+button.primary, button.secondary {
+  border: none; padding: 10px 16px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: transform 0.05s, opacity 0.2s;
+}
+button.primary { background: var(--accent); color: white; }
+button.secondary { background: var(--bg-3); color: var(--text); border: 1px solid var(--border); }
+button.primary:active, button.secondary:active { transform: scale(0.97); }
+button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.metric {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px;
+}
+.metric .label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+.metric .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+.metric .value.accent { color: var(--accent); }
+.metric .value.good { color: var(--good); }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); }
+th { color: var(--text-dim); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+tr.podium-1 td { background: rgba(245, 182, 81, 0.08); }
+tr.podium-2 td { background: rgba(154, 167, 189, 0.06); }
+tr.podium-3 td { background: rgba(204, 124, 79, 0.06); }
+.rank { font-weight: 700; color: var(--accent); }
+
+pre.output {
+  background: var(--bg-3); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px; font-size: 12px; overflow-x: auto; white-space: pre;
+  color: var(--text);
+}
+
+.bench-table { font-size: 12px; }
+.bench-table .winner { color: var(--good); font-weight: 700; }
+
+#chartCanvas { width: 100% !important; max-height: 280px; }
+#treemapCanvas { width: 100% !important; max-height: 320px; }
+
+.test-line { font-family: ui-monospace, monospace; font-size: 12px; padding: 4px 8px; border-radius: 4px; }
+.test-line.ok { color: var(--good); }
+.test-line.fail { color: var(--bad); background: rgba(239, 79, 107, 0.08); }
+
+footer { text-align: center; padding: 24px 12px; color: var(--text-dim); font-size: 11px; }
+footer a { color: var(--accent); text-decoration: none; }
+
+@media (min-width: 720px) {
+  header { padding: 18px 28px; }
+  header h1 { font-size: 18px; }
+  main { padding: 24px; }
+  .card { padding: 20px; }
+}
