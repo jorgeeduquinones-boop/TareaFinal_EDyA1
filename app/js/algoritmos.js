@@ -110,7 +110,7 @@ function radixSortPorTotalSpentDesc(arr) {
   let max = 0;
   for (const c of arr) if (c.totalSpent > max) max = c.totalSpent;
   // Construimos clave invertida = max - totalSpent para ordenar asc.
-  const claves = new Array(arr.length);
+  let claves = new Array(arr.length);
   for (let i = 0; i < arr.length; i++) claves[i] = max - arr[i].totalSpent;
   // Determinar número de dígitos (base 256 para mejor rendimiento).
   const BASE = 256;
