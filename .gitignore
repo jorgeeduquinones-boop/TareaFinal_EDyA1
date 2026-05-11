@@ -8,3 +8,9 @@ Thumbs.db
 .env
 .env.local
 coverage/
+
+# Build temporal de generación de documentos (pptx/docx)
+.pptx-build/
+
+# Archivos temporales de Office (lock files)
+~$*

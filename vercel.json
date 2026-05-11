@@ -1,17 +1,26 @@
 {
   "buildCommand": null,
-  "outputDirectory": "app",
+  "outputDirectory": ".",
+  "cleanUrls": false,
+  "trailingSlash": false,
   "headers": [
     {
-      "source": "/service-worker.js",
+      "source": "/app/service-worker.js",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
-        { "key": "Service-Worker-Allowed", "value": "/" }
+        { "key": "Service-Worker-Allowed", "value": "/app/" }
       ]
     },
     {
-      "source": "/manifest.json",
+      "source": "/app/manifest.json",
       "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }]
+    },
+    {
+      "source": "/(.*\\.(?:js|css|svg|png|jpg|woff2))",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     }
+  ],
+  "redirects": [
+    { "source": "/app", "destination": "/app/inicio.html", "permanent": false }
   ]
 }

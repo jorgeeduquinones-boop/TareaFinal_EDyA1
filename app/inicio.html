@@ -1,72 +1,78 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0a0d14">
-  <meta name="description" content="Conoce a tus mejores clientes — Análisis simple para tu tienda online">
+  <meta name="theme-color" content="#F8FAFC">
+  <meta name="description" content="Clientela — Identifica tus clientes más valiosos a partir de tu historial de ventas">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icons/icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <title>Mi Tienda — Conoce a tus mejores clientes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>Clientela — Análisis de clientes desde tu navegador</title>
   <link rel="stylesheet" href="./css/styles.css">
   <link rel="stylesheet" href="./css/inicio.css">
 </head>
 <body>
+
   <header>
-    <div class="brand">
-      <div class="logo">🛍️</div>
-      <div>
-        <h1>Mi Tienda</h1>
-        <div class="subtitle">Conoce a tus mejores clientes</div>
+    <div class="header-row">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg class="lucide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+        </div>
+        <div>
+          <h1>Clientela</h1>
+          <div class="breadcrumb">Análisis de clientes desde tu navegador</div>
+        </div>
       </div>
+      <span class="spacer"></span>
+      <a href="./index.html" class="icon-btn" title="Modo desarrollador" aria-label="Modo desarrollador">
+        <svg class="lucide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      </a>
+      <button id="btnTheme" class="icon-btn" title="Cambiar tema" aria-label="Cambiar tema"></button>
     </div>
-    <span class="spacer"></span>
-    <a href="./index.html" class="icon-btn" title="Modo desarrollador" aria-label="Modo desarrollador">⚙️</a>
-    <button id="btnTheme" class="icon-btn" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
   </header>
 
-  <!-- ============================================================
-                          HERO / WIZARD STEPS
-  ============================================================ -->
   <main>
 
     <!-- PASO 1: Bienvenida -->
     <section id="step-welcome" class="step active">
       <div class="hero">
-        <div class="hero-badge">📊 Análisis simple en 3 clicks</div>
+        <div class="hero-eyebrow">Tarea Final · EDyA1 · UAO 2026-1</div>
         <h1 class="hero-title">
-          Descubre <span class="grad">quiénes</span> son
-          <span class="grad">tus mejores clientes</span>
+          Identifica tus 10 clientes más valiosos a partir de tu historial de ventas.
         </h1>
         <p class="hero-sub">
-          Sube las ventas de tu tienda y te mostramos en segundos quiénes te
-          generan más ingresos, qué categorías son tus estrellas y a quién
-          deberías premiar para que vuelva a comprar.
+          Sube un CSV con tus ventas (<code>customer, product, category, price, quantity, fecha</code>) y obtén el ranking de clientes ordenado por ingresos, con su categoría favorita.
         </p>
         <div class="hero-actions">
-          <button class="primary big" id="ctaStart">🚀 Empezar ahora</button>
-          <button class="secondary big" id="ctaDemo">👀 Ver con datos de ejemplo</button>
+          <button class="primary big" id="ctaStart">Empezar</button>
+          <button class="secondary big" id="ctaDemo">Ver ejemplo</button>
         </div>
 
         <div class="features">
           <div class="feature">
-            <span class="ico">⚡</span>
-            <h4>Resultados al instante</h4>
-            <p>Análisis local en tu navegador, sin esperas ni servidores.</p>
+            <div class="ico"><svg class="lucide" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></div>
+            <h4>Procesa 10.000 ventas en menos de 50 ms</h4>
+            <p>Algoritmos propios de ordenamiento ejecutados localmente en tu navegador.</p>
           </div>
           <div class="feature">
-            <span class="ico">🔒</span>
-            <h4>Tus datos no salen de aquí</h4>
-            <p>Todo se procesa en tu dispositivo. Cero envío a la nube.</p>
+            <div class="ico"><svg class="lucide" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <h4>100% en el navegador</h4>
+            <p>No se envía nada a ningún servidor. Tus ventas no salen del dispositivo.</p>
           </div>
           <div class="feature">
-            <span class="ico">📱</span>
-            <h4>Funciona en el celular</h4>
-            <p>Instálala como app desde Chrome y úsala incluso sin internet.</p>
+            <div class="ico"><svg class="lucide" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+            <h4>Instalable como app (PWA)</h4>
+            <p>Disponible en Android, iOS y escritorio. Funciona offline.</p>
+          </div>
+          <div class="feature">
+            <div class="ico"><svg class="lucide" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></div>
+            <h4>Algoritmos propios</h4>
+            <p>MergeSort estable multi-criterio, sin usar <code>Array.sort</code>. Complejidad documentada.</p>
           </div>
         </div>
       </div>
@@ -77,19 +83,19 @@
       <div class="step-header">
         <span class="step-num">Paso 1 de 2</span>
         <h2>Trae los datos de tus ventas</h2>
-        <p>Elige cómo quieres empezar. La opción más rápida es probar con datos de ejemplo.</p>
+        <p>Elige cómo quieres empezar.</p>
       </div>
 
       <div class="choices">
         <button class="choice-card" id="choiceDemo">
-          <div class="choice-icon">🎯</div>
+          <div class="choice-icon"><svg class="lucide" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg></div>
           <h3>Probar con datos de ejemplo</h3>
-          <p>Empieza con la "Tienda Demo": 5.000 ventas reales sintéticas.</p>
+          <p>Empieza con la "Tienda Demo": 5.000 ventas sintéticas reproducibles.</p>
           <span class="choice-cta">Ver ejemplo →</span>
         </button>
 
         <label class="choice-card" id="choiceUpload">
-          <div class="choice-icon">📁</div>
+          <div class="choice-icon"><svg class="lucide" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
           <h3>Subir mi archivo CSV</h3>
           <p>Cabecera esperada: <code>customer,product,category,price,quantity,timestamp</code>.</p>
           <span class="choice-cta">Seleccionar archivo →</span>
@@ -97,19 +103,21 @@
         </label>
 
         <button class="choice-card" id="choicePaste">
-          <div class="choice-icon">📋</div>
+          <div class="choice-icon"><svg class="lucide" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
           <h3>Pegar mis ventas a mano</h3>
-          <p>Si tienes una lista de ventas, pégala con el formato del enunciado.</p>
+          <p>Si tienes una lista, pégala con el formato del enunciado.</p>
           <span class="choice-cta">Pegar texto →</span>
         </button>
       </div>
 
       <div id="pasteArea" class="paste-area" hidden>
-        <label>Pega tus records (separados por <code>;</code>)</label>
-        <textarea id="pasteInput" placeholder="Customer1 Laptop Technology 3000 1 10;..."></textarea>
-        <div class="actions">
-          <button class="primary" id="btnUsePaste">▶ Continuar</button>
-          <button class="ghost" id="btnCancelPaste">Cancelar</button>
+        <div class="card">
+          <label>Pega tus records (separados por <code>;</code>)</label>
+          <textarea id="pasteInput" placeholder="Customer1 Laptop Technology 3000 1 10;..."></textarea>
+          <div class="actions">
+            <button class="primary" id="btnUsePaste">Continuar</button>
+            <button class="ghost" id="btnCancelPaste">Cancelar</button>
+          </div>
         </div>
       </div>
 
@@ -127,43 +135,39 @@
           <p id="resultsSubtitle"></p>
         </div>
         <div class="results-actions">
-          <button class="secondary" id="btnNewAnalysis">🔄 Nuevo análisis</button>
-          <button class="primary" id="btnDownloadReport">⬇ Descargar reporte</button>
+          <button class="secondary" id="btnNewAnalysis">Nuevo análisis</button>
+          <button class="primary" id="btnDownloadReport">Descargar reporte</button>
         </div>
       </div>
 
-      <!-- Big numbers -->
       <div class="big-numbers"></div>
 
-      <!-- Top customers -->
       <div class="card">
         <div class="card-header">
-          <h2>🏆 Tus mejores clientes</h2>
-          <span class="card-action" id="exportCsvUser">⬇ Exportar a CSV</span>
+          <h2>Tus mejores clientes</h2>
+          <span class="card-action" id="exportCsvUser">Exportar a CSV</span>
         </div>
         <div id="topCustomers" class="customers-grid"></div>
       </div>
 
-      <!-- Insights -->
       <div class="card">
-        <div class="card-header"><h2>💡 Lo que descubrimos</h2></div>
+        <div class="card-header"><h2>Lo que descubrimos</h2></div>
         <div id="insights" class="insights-list"></div>
       </div>
 
-      <!-- Recommendations -->
       <div class="card">
-        <div class="card-header"><h2>🎯 Qué hacer ahora</h2></div>
+        <div class="card-header"><h2>Qué hacer ahora</h2></div>
         <div id="recommendations" class="recommendations"></div>
       </div>
 
-      <!-- Charts -->
       <div class="card">
-        <div class="card-header"><h2>📈 ¿De dónde vienen tus ingresos?</h2></div>
+        <div class="card-header"><h2>¿De dónde vienen tus ingresos?</h2></div>
         <div class="chart-wrap"><canvas id="catChartUser"></canvas></div>
+        <div id="insightCatsUser" class="chart-insight" hidden></div>
       </div>
 
       <div class="card">
-        <div class="card-header"><h2>📊 Top clientes por gasto</h2></div>
+        <div class="card-header"><h2>Top clientes por gasto</h2></div>
         <div class="chart-wrap"><canvas id="topChartUser"></canvas></div>
       </div>
     </section>
@@ -171,7 +175,7 @@
   </main>
 
   <footer>
-    Hecha con ❤️ para EDyA1 · UAO 2026-1 ·
+    Clientela · Tarea Final EDyA1 · UAO 2026-1 ·
     <a href="./index.html">Modo desarrollador</a>
   </footer>
 
@@ -182,6 +186,7 @@
   <script src="./js/parser.js"></script>
   <script src="./js/util.js"></script>
   <script src="./js/generador.js"></script>
+  <script src="./js/icons.js"></script>
   <script src="./js/inicio.js"></script>
 </body>
 </html>

@@ -1,30 +1,44 @@
 // =============================================================================
-// app.js — Lógica de la UI
+// app.js — Clientela · Lógica de UI del modo desarrollador
 // =============================================================================
 
 const EJEMPLO_PDF = 'Customer1 Laptop Technology 3000 1 10;Customer2 Shirt Clothing 50 2 12;Customer1 Mouse Technology 100 1 15;Customer2 Shoes Clothing 200 1 20;Customer3 TV Technology 2500 1 25';
+
+const icon = window.Icons ? window.Icons.icon : ((n, s) => '');
 
 let chartActual = null;
 let catChartActual = null;
 
 // ============================================================================
-// Tema (light/dark)
+// Formato
+// ============================================================================
+const NF_NUM = new Intl.NumberFormat('es-CO');
+const NF_MONEY = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+
+function fmtNum(n) { return NF_NUM.format(Math.round(+n || 0)); }
+function fmtMoney(n) { return NF_MONEY.format(Math.round(+n || 0)); }
+
+// ============================================================================
+// Tema (light/dark) con SVG sun/moon
 // ============================================================================
 function temaInicial() {
   const guardado = localStorage.getItem('tema');
   if (guardado) return guardado;
-  return matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 function aplicarTema(tema) {
   document.documentElement.dataset.theme = tema;
   localStorage.setItem('tema', tema);
-  document.getElementById('btnTheme').textContent = tema === 'dark' ? '☀️' : '🌙';
-  document.querySelector('meta[name="theme-color"]').content = tema === 'dark' ? '#0a0d14' : '#f8fafc';
-  // Re-renderizar gráficos para que tomen los nuevos colores.
+  const btn = document.getElementById('btnTheme');
+  if (btn) btn.innerHTML = tema === 'dark' ? icon('sun', 18) : icon('moon', 18);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = tema === 'dark' ? '#0F1117' : '#F8FAFC';
+
   if (chartActual || catChartActual) {
     const out = document.getElementById('output').textContent;
-    if (out) { renderGrafico(out); renderGraficoCategorias(out); }
+    const entrada = document.getElementById('inputCaso').value;
+    if (out) { renderGrafico(out); renderGraficoCategorias(entrada); }
   }
 }
 
@@ -34,7 +48,8 @@ function aplicarTema(tema) {
 let toastTimer = null;
 function toast(mensaje, tipo) {
   const t = document.getElementById('toast');
-  t.textContent = mensaje;
+  const ico = tipo === 'success' ? icon('check-circle', 16) : tipo === 'error' ? icon('x-circle', 16) : icon('info', 16);
+  t.innerHTML = ico + '<span>' + escapeHtml(mensaje) + '</span>';
   t.className = 'toast ' + (tipo || '') + ' show';
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
@@ -59,7 +74,7 @@ function inicializarTabs() {
 // ============================================================================
 function analizar() {
   const entrada = document.getElementById('inputCaso').value.trim();
-  if (!entrada) { toast('Pega un caso o usa el ejemplo del PDF', 'error'); return; }
+  if (!entrada) { toast('Pega un caso o usa el ejemplo del enunciado', 'error'); return; }
 
   try {
     const t0 = performance.now();
@@ -72,13 +87,15 @@ function analizar() {
     renderGrafico(salida);
     renderGraficoCategorias(entrada);
     toast('Análisis completado en ' + (t1 - t0).toFixed(2) + ' ms', 'success');
-    // Cambiar al tab de análisis.
     document.querySelector('.tabs button[data-panel="analisis"]').click();
   } catch (e) {
     toast('Error: ' + e.message, 'error');
   }
 }
 
+// ----------------------------------------------------------------------------
+// KPIs re-jerarquizados: 1 hero (Volumen total) + 3 normales + 2 small
+// ----------------------------------------------------------------------------
 function renderResumen(entrada, salida, ms) {
   const records = Parser.parsearCaso(entrada);
   const nClientes = salida ? salida.split('\n').length : 0;
@@ -87,41 +104,35 @@ function renderResumen(entrada, salida, ms) {
   const ticketMedio = records.length ? totalGastado / records.length : 0;
 
   document.getElementById('metrics').innerHTML = `
-    <div class="metric">
-      <div class="icon-bg">📦</div>
-      <div class="label">Records</div>
-      <div class="value">${records.length.toLocaleString()}</div>
-      <div class="sublabel">transacciones procesadas</div>
+    <div class="metric hero">
+      <div class="label">${icon('dollar-sign', 14)} Volumen total</div>
+      <div class="value tnum">${fmtMoney(totalGastado)}</div>
+      <div class="sublabel">${fmtNum(records.length)} transacciones · suma de price × quantity</div>
     </div>
-    <div class="metric">
-      <div class="icon-bg">👥</div>
-      <div class="label">Clientes</div>
-      <div class="value gradient">${nClientes}</div>
+    <div class="metric normal">
+      <div class="label">${icon('users', 14)} Clientes</div>
+      <div class="value tnum">${fmtNum(nClientes)}</div>
       <div class="sublabel">en el ranking final</div>
     </div>
-    <div class="metric">
-      <div class="icon-bg">🏷️</div>
-      <div class="label">Categorías</div>
-      <div class="value">${cats.size}</div>
-      <div class="sublabel">distintas</div>
+    <div class="metric normal">
+      <div class="label">${icon('tag', 14)} Categorías</div>
+      <div class="value tnum">${fmtNum(cats.size)}</div>
+      <div class="sublabel">distintas en el caso</div>
     </div>
-    <div class="metric">
-      <div class="icon-bg">💰</div>
-      <div class="label">Volumen total</div>
-      <div class="value good">$${totalGastado.toLocaleString()}</div>
-      <div class="sublabel">suma de price × quantity</div>
-    </div>
-    <div class="metric">
-      <div class="icon-bg">🎫</div>
-      <div class="label">Ticket medio</div>
-      <div class="value">$${ticketMedio.toFixed(0)}</div>
+    <div class="metric normal">
+      <div class="label">${icon('credit-card', 14)} Ticket medio</div>
+      <div class="value tnum">${fmtMoney(ticketMedio)}</div>
       <div class="sublabel">por transacción</div>
     </div>
-    <div class="metric">
-      <div class="icon-bg">⚡</div>
-      <div class="label">Tiempo</div>
-      <div class="value">${ms.toFixed(2)} <span style="font-size:14px; color:var(--text-muted);">ms</span></div>
-      <div class="sublabel">de análisis end-to-end</div>
+    <div class="metric small">
+      <div class="label">${icon('package', 14)} Records</div>
+      <div class="value tnum">${fmtNum(records.length)}</div>
+      <div class="sublabel">procesados</div>
+    </div>
+    <div class="metric small">
+      <div class="label">${icon('timer', 14)} Tiempo</div>
+      <div class="value tnum">${ms.toFixed(2)} <span style="font-size:14px; color:var(--text-muted); font-weight:500;">ms</span></div>
+      <div class="sublabel">end-to-end</div>
     </div>
   `;
 }
@@ -135,13 +146,11 @@ function renderTabla(salida) {
   const filas = lineas.map((linea, idx) => {
     const m = linea.match(/^(\d+)\) (\S+) (\d+) (.+)$/);
     if (!m) return '';
-    const podium = idx < 3 ? `podium-${idx + 1}` : '';
     const rankClass = idx === 0 ? 'gold' : idx === 1 ? 'silver' : idx === 2 ? 'bronze' : '';
-    const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '';
-    return `<tr class="${podium}">
-      <td class="rank ${rankClass}">${medal} ${m[1]}</td>
+    return `<tr>
+      <td><span class="rank-badge ${rankClass} tnum">${m[1]}</span></td>
       <td><strong>${escapeHtml(m[2])}</strong></td>
-      <td>$${(+m[3]).toLocaleString()}</td>
+      <td class="tnum">${fmtMoney(+m[3])}</td>
       <td><span class="chip accent">${escapeHtml(m[4])}</span></td>
     </tr>`;
   }).join('');
@@ -154,14 +163,15 @@ function renderTabla(salida) {
 }
 
 // ============================================================================
-// Gráficos
+// Gráficos (sin gradientes; usan el color de marca sólido)
 // ============================================================================
-function coloresAccent(n) {
-  const tema = document.documentElement.dataset.theme;
-  const baseHue = tema === 'dark' ? 240 : 245;
-  const sat = tema === 'dark' ? 70 : 65;
-  const light = tema === 'dark' ? 65 : 60;
-  return Array.from({length: n}, (_, i) => `hsl(${baseHue + i * 18}, ${sat}%, ${light}%)`);
+function paletaSolida(n) {
+  // Variaciones de tono del color de marca (#2563EB) en HSL.
+  // Hue base ≈ 220, sat 80%, lightness variable.
+  return Array.from({ length: n }, (_, i) => {
+    const lightness = 50 + (i % 5) * 7;
+    return `hsl(220, 80%, ${lightness}%)`;
+  });
 }
 
 function getChartColors() {
@@ -169,6 +179,7 @@ function getChartColors() {
   return {
     text: tema === 'dark' ? '#94a3b8' : '#475569',
     grid: tema === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)',
+    bg: tema === 'dark' ? '#1F232D' : '#FFFFFF',
   };
 }
 
@@ -186,26 +197,38 @@ function renderGrafico(salida) {
   if (chartActual) chartActual.destroy();
   chartActual = new Chart(ctx, {
     type: 'bar',
-    data: { labels, datasets: [{ label: 'Total gastado', data, backgroundColor: coloresAccent(labels.length), borderRadius: 8, borderSkipped: false }] },
+    data: { labels, datasets: [{ label: 'Total gastado', data, backgroundColor: '#2563EB', borderRadius: 6, borderSkipped: false }] },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: 'rgba(15,23,42,0.95)', borderColor: 'rgba(129,140,248,0.4)', borderWidth: 1,
-          padding: 12, cornerRadius: 8, titleFont: {weight:'700'},
+          backgroundColor: colors.bg, borderColor: 'rgba(37,99,235,0.4)', borderWidth: 1,
+          titleColor: '#0F172A', bodyColor: '#0F172A',
+          padding: 12, cornerRadius: 8, titleFont: { weight: '700' },
           callbacks: {
-            label: (ctx) => '  $' + ctx.parsed.y.toLocaleString(),
+            label: (ctx) => '  ' + fmtMoney(ctx.parsed.y),
             afterLabel: (ctx) => '  Categoría: ' + cats[ctx.dataIndex],
           },
         },
       },
       scales: {
-        x: { ticks: { color: colors.text, font: {weight:'600'} }, grid: { display: false } },
-        y: { ticks: { color: colors.text, callback: v => '$' + v.toLocaleString() }, grid: { color: colors.grid } },
+        x: { ticks: { color: colors.text, font: { weight: '600' } }, grid: { display: false } },
+        y: { ticks: { color: colors.text, callback: v => fmtMoney(v) }, grid: { color: colors.grid } },
       },
     },
   });
+
+  // Insight automático
+  const total = data.reduce((s, v) => s + v, 0);
+  if (data.length > 0) {
+    const top1Pct = ((data[0] / total) * 100).toFixed(1);
+    const top3 = data.slice(0, 3).reduce((s, v) => s + v, 0);
+    const top3Pct = ((top3 / total) * 100).toFixed(0);
+    const ins = document.getElementById('insightTop');
+    ins.hidden = false;
+    ins.innerHTML = `${icon('sparkles', 16)}<span><strong>${escapeHtml(labels[0])}</strong> representa el <strong>${top1Pct}%</strong> del gasto entre los visibles. Los 3 primeros suman el <strong>${top3Pct}%</strong>.</span>`;
+  }
 }
 
 function renderGraficoCategorias(entrada) {
@@ -223,18 +246,33 @@ function renderGraficoCategorias(entrada) {
   if (catChartActual) catChartActual.destroy();
   catChartActual = new Chart(ctx, {
     type: 'doughnut',
-    data: { labels, datasets: [{ data, backgroundColor: coloresAccent(labels.length), borderWidth: 0, hoverOffset: 8 }] },
+    data: { labels, datasets: [{ data, backgroundColor: paletaSolida(labels.length), borderWidth: 0, hoverOffset: 6 }] },
     options: {
       responsive: true, maintainAspectRatio: false, cutout: '62%',
       plugins: {
-        legend: { position: 'right', labels: { color: colors.text, font:{weight:'600'}, padding: 12, boxWidth: 12, boxHeight: 12 } },
+        legend: { position: 'right', labels: { color: colors.text, font: { weight: '600' }, padding: 12, boxWidth: 12, boxHeight: 12 } },
         tooltip: {
-          backgroundColor: 'rgba(15,23,42,0.95)', padding: 12, cornerRadius: 8,
-          callbacks: { label: (ctx) => '  $' + ctx.parsed.toLocaleString() },
+          backgroundColor: colors.bg,
+          titleColor: '#0F172A', bodyColor: '#0F172A',
+          padding: 12, cornerRadius: 8,
+          callbacks: { label: (ctx) => '  ' + fmtMoney(ctx.parsed) },
         },
       },
     },
   });
+
+  // Insight automático
+  if (data.length > 0) {
+    const total = data.reduce((s, v) => s + v, 0);
+    const top = data[0];
+    const topPct = ((top / total) * 100).toFixed(1);
+    const ins = document.getElementById('insightCats');
+    ins.hidden = false;
+    let extra = '';
+    if (+topPct >= 60) extra = ' Tienes alta dependencia de una sola categoría — considera diversificar.';
+    else if (+topPct < 25) extra = ' La distribución es equilibrada entre categorías.';
+    ins.innerHTML = `${icon('sparkles', 16)}<span><strong>${escapeHtml(labels[0])}</strong> genera el <strong>${topPct}%</strong> de los ingresos (${fmtMoney(top)} de ${fmtMoney(total)}).${extra}</span>`;
+  }
 }
 
 function escapeHtml(s) {
@@ -242,11 +280,11 @@ function escapeHtml(s) {
 }
 
 // ============================================================================
-// Helpers de datos
+// Carga / limpieza
 // ============================================================================
 function cargarEjemplo() {
   document.getElementById('inputCaso').value = EJEMPLO_PDF;
-  toast('Ejemplo del PDF cargado', 'success');
+  toast('Ejemplo del enunciado cargado', 'success');
 }
 
 function limpiar() {
@@ -254,9 +292,11 @@ function limpiar() {
   document.getElementById('output').textContent = '';
   document.getElementById('rankingTabla').innerHTML = '';
   document.getElementById('metrics').innerHTML = '';
+  const insT = document.getElementById('insightTop'); if (insT) insT.hidden = true;
+  const insC = document.getElementById('insightCats'); if (insC) insC.hidden = true;
   if (chartActual) { chartActual.destroy(); chartActual = null; }
   if (catChartActual) { catChartActual.destroy(); catChartActual = null; }
-  toast('Limpio', 'success');
+  toast('Listo', 'success');
 }
 
 function generar() {
@@ -269,7 +309,7 @@ function generar() {
   const t1 = performance.now();
   document.getElementById('inputCaso').value = caso;
   document.getElementById('genInfo').innerHTML =
-    `<span class="chip good">✓</span> Generados <strong>${m.toLocaleString()}</strong> records, <strong>${n}</strong> clientes, <strong>${p}</strong> categorías en ${(t1-t0).toFixed(1)} ms.`;
+    `<span class="chip good">${icon('check-circle', 12)} OK</span> Generados <strong class="tnum">${fmtNum(m)}</strong> records, <strong class="tnum">${fmtNum(n)}</strong> clientes, <strong class="tnum">${fmtNum(p)}</strong> categorías en ${(t1 - t0).toFixed(1)} ms.`;
   analizar();
 }
 
@@ -285,7 +325,7 @@ function leerCsv(file) {
     }
     const records = lineas.map(l => l.split(',').map(s => s.trim()).join(' '));
     document.getElementById('inputCaso').value = records.join(';');
-    toast(`${lineas.length} records cargados desde CSV`, 'success');
+    toast(`${fmtNum(lineas.length)} records cargados desde CSV`, 'success');
     analizar();
   };
   reader.readAsText(file);
@@ -342,7 +382,7 @@ function correrBenchmark() {
   const n = +document.getElementById('benchN').value || 200;
   const p = +document.getElementById('benchP').value || 5;
   const cont = document.getElementById('benchResultados');
-  cont.innerHTML = '<div class="empty"><span class="spinner"></span><h3 style="margin-top:12px;">Corriendo benchmark...</h3></div>';
+  cont.innerHTML = `<div class="empty"><span class="spinner"></span><h3 style="margin-top:12px;">Corriendo benchmark…</h3><p>Midiendo ${fmtNum(m)} records · ${fmtNum(n)} clientes · ${fmtNum(p)} categorías</p></div>`;
 
   setTimeout(() => {
     try {
@@ -356,20 +396,20 @@ function correrBenchmark() {
         return `
           <div class="bench-bar">
             <div>
-              <span class="name">${winner ? '🏆 ' : ''}${escapeHtml(t.algoritmo)}</span>
+              <span class="name">${winner ? icon('trophy', 14) + ' ' : ''}${escapeHtml(t.algoritmo)}</span>
               ${t.nota ? `<span class="nota">${escapeHtml(t.nota)}</span>` : ''}
             </div>
-            <span class="ms ${winner ? 'winner' : ''}">${t.ms} ms</span>
+            <span class="ms tnum ${winner ? 'winner' : ''}">${t.ms} ms</span>
             <div class="track"><div class="fill" style="width:${pct}%"></div></div>
           </div>
         `;
       }).join('');
       cont.innerHTML = `
-        <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
-          <span class="chip">m = ${r.params.m.toLocaleString()}</span>
-          <span class="chip">n = ${r.params.n}</span>
-          <span class="chip">p = ${r.params.p}</span>
-          <span class="chip accent">→ ${r.nClientes} clientes ordenados</span>
+        <div style="font-size:13px; color:var(--text-muted); margin-bottom:12px; display:flex; gap:6px; flex-wrap:wrap;">
+          <span class="chip">m = <strong class="tnum">${fmtNum(r.params.m)}</strong></span>
+          <span class="chip">n = <strong class="tnum">${fmtNum(r.params.n)}</strong></span>
+          <span class="chip">p = <strong class="tnum">${fmtNum(r.params.p)}</strong></span>
+          <span class="chip accent">→ <strong class="tnum">${fmtNum(r.nClientes)}</strong> clientes ordenados</span>
         </div>
         <div class="bench-bars">${barras}</div>
       `;
@@ -380,32 +420,91 @@ function correrBenchmark() {
 }
 
 // ============================================================================
-// Tests
+// Pruebas — pre-listadas con estado individual
 // ============================================================================
+function renderTestList(estados) {
+  const cont = document.getElementById('testList');
+  if (!cont || !window.TestRunner) return;
+  const tests = window.TestRunner.tests;
+  const html = tests.map((t, i) => {
+    const e = estados[i] || { status: 'pending', ms: null, err: null };
+    const ico = e.status === 'ok' ? icon('check-circle', 16)
+              : e.status === 'fail' ? icon('x-circle', 16)
+              : icon('circle', 16);
+    const labelStatus = e.status === 'ok' ? 'Pasó' : e.status === 'fail' ? 'Falló' : 'Pendiente';
+    const tiempo = e.ms != null ? `<span class="test-time">${e.ms.toFixed(2)} ms</span>` : `<span class="test-time">${labelStatus}</span>`;
+    return `<div class="test-line ${e.status}">
+      ${ico}
+      <span class="test-name">${escapeHtml(t.nombre)}${e.err ? '<br><small style="color:var(--text-dim);">' + escapeHtml(e.err) + '</small>' : ''}</span>
+      ${tiempo}
+    </div>`;
+  }).join('');
+  cont.innerHTML = html;
+}
+
+function actualizarSummary(estados) {
+  const tests = window.TestRunner ? window.TestRunner.tests : [];
+  const sum = document.getElementById('testSummary');
+  const total = tests.length;
+  const ok = estados.filter(e => e && e.status === 'ok').length;
+  const fail = estados.filter(e => e && e.status === 'fail').length;
+  const pend = total - ok - fail;
+  if (pend === total) sum.textContent = `${total} pruebas pendientes`;
+  else if (fail > 0) {
+    sum.textContent = `${fail}/${total} fallaron`;
+    sum.className = 'chip';
+    sum.style.background = 'rgba(239, 68, 68, 0.10)';
+    sum.style.color = 'var(--bad)';
+    sum.style.borderColor = 'rgba(239, 68, 68, 0.30)';
+  } else {
+    sum.textContent = `${ok}/${total} pruebas pasaron`;
+    sum.className = 'chip good';
+  }
+}
+
 function correrTests() {
+  if (!window.TestRunner) return;
+  const tests = window.TestRunner.tests;
+  const estados = tests.map(() => ({ status: 'pending', ms: null, err: null }));
+  let totalMs = 0;
+
+  for (let i = 0; i < tests.length; i++) {
+    const t0 = performance.now();
+    try {
+      tests[i].fn();
+      const ms = performance.now() - t0;
+      estados[i] = { status: 'ok', ms, err: null };
+      totalMs += ms;
+    } catch (e) {
+      const ms = performance.now() - t0;
+      estados[i] = { status: 'fail', ms, err: e.message };
+      totalMs += ms;
+    }
+  }
+
+  renderTestList(estados);
+  actualizarSummary(estados);
+
+  const ok = estados.filter(e => e.status === 'ok').length;
+  const fail = estados.filter(e => e.status === 'fail').length;
   const cont = document.getElementById('testResultados');
   cont.innerHTML = '';
-  const lineas = [];
-  TestRunner.correr((linea) => lineas.push(linea));
-  let okCount = 0, failCount = 0;
-  for (const linea of lineas) {
-    if (linea.startsWith('  OK')) okCount++;
-    else if (linea.startsWith('FAIL')) failCount++;
-    else continue;
-    const div = document.createElement('div');
-    const isFail = linea.startsWith('FAIL');
-    div.className = 'test-line ' + (isFail ? 'fail' : 'ok');
-    div.innerHTML = `<span class="badge-test">${isFail ? 'FAIL' : 'OK'}</span><span>${escapeHtml(linea.replace(/^(  OK|FAIL)\s+/, ''))}</span>`;
-    cont.appendChild(div);
-  }
-  const total = okCount + failCount;
-  const sumario = document.createElement('div');
-  sumario.className = 'test-summary ' + (failCount === 0 ? 'ok' : 'fail');
-  sumario.innerHTML = failCount === 0
-    ? `✅ ${okCount}/${total} tests pasaron`
-    : `❌ ${failCount}/${total} tests fallaron`;
-  cont.appendChild(sumario);
-  toast(failCount === 0 ? 'Todos los tests pasaron' : `${failCount} tests fallaron`, failCount === 0 ? 'success' : 'error');
+  const div = document.createElement('div');
+  div.className = 'test-summary ' + (fail === 0 ? 'ok' : 'fail');
+  div.innerHTML = fail === 0
+    ? `${icon('check-circle', 18)} ${ok}/${tests.length} pruebas pasaron en ${totalMs.toFixed(2)} ms`
+    : `${icon('x-circle', 18)} ${fail}/${tests.length} pruebas fallaron · ${ok} pasaron`;
+  cont.appendChild(div);
+
+  toast(fail === 0 ? 'Todas las pruebas pasaron' : `${fail} pruebas fallaron`, fail === 0 ? 'success' : 'error');
+}
+
+function inicializarTests() {
+  if (!window.TestRunner) return;
+  const tests = window.TestRunner.tests;
+  const estados = tests.map(() => ({ status: 'pending', ms: null, err: null }));
+  renderTestList(estados);
+  actualizarSummary(estados);
 }
 
 // ============================================================================
@@ -415,6 +514,7 @@ window.addEventListener('DOMContentLoaded', () => {
   aplicarTema(temaInicial());
   inicializarTabs();
   inicializarDropzone();
+  inicializarTests();
 
   document.getElementById('btnTheme').addEventListener('click', () => {
     aplicarTema(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
@@ -429,7 +529,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('exportCsv').addEventListener('click', exportarCsv);
   document.getElementById('copyOutput').addEventListener('click', copiarOutput);
 
-  // Atajos de teclado
+  // Atajos
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); analizar(); }
     if ((e.ctrlKey || e.metaKey) && e.key === 'l') { e.preventDefault(); limpiar(); }

@@ -1,37 +1,120 @@
-function calcularPedidos(caso) {
-    const registros = caso.split(';');
-    const resumenClientes = {};
+/*
+ *  util.js - Función calcularPedidos
+ *  Tarea Final EDyA1 - Análisis de Pedidos en Comercio Electrónico
+ *  Universidad Autónoma de Occidente - 2026-1
+ *  Profesor: Orlando Arboleda Molina, Msc.
+ *
+ *  ENTRADA  (string):
+ *    record1;record2;...;recordm
+ *    Cada record:  customer product category price quantity timestamp
+ *
+ *  SALIDA   (string, n líneas):
+ *    [pos]) customer totalSpent favoriteCategory
+ *
+ *  CRITERIOS DE ORDEN DEL RANKING:
+ *    1) totalSpent          - DESCENDENTE
+ *    2) favoriteCategory    - DESCENDENTE
+ *    3) customer            - ASCENDENTE
+ *
+ *  ─────────────────────────────────────────────────────────────────────
+ *  ANÁLISIS DE COMPLEJIDAD COMPUESTA
+ *  ─────────────────────────────────────────────────────────────────────
+ *    m = #records      n = #clientes
+ *    p = #categorías promedio por cliente   k = longitud media de campo
+ *
+ *    Parseo (parser.js)               →  O(m · k)
+ *    Acumulación por cliente          →  O(m)        [hash O(1) amortiz.]
+ *    Cálculo categoría favorita       →  O(n · p)
+ *    QuickSort propio (ord.js)        →  O(n log n)  promedio
+ *    Formateo de salida               →  O(n · k)
+ *    ────────────────────────────────────────────
+ *    TOTAL                            →  O(m + n·p + n log n)
+ *
+ *  ─────────────────────────────────────────────────────────────────────
+ *  CONCEPTOS DEL CURSO APLICADOS
+ *  ─────────────────────────────────────────────────────────────────────
+ *    Práctica 4 (Recursividad):
+ *      → Funciones recursivas auxiliares en recursividad.js
+ *        (suma total, conteo premium, top cliente).
+ *      → Estructura recursiva del propio QuickSort.
+ *
+ *    Práctica 5 (Ordenamiento):
+ *      → QuickSort recursivo basado en el esquema particion_por_Nombre /
+ *        quickSort_por_Nombre, con tres mejoras profesionales:
+ *          - mediana de tres como pivote (evita peor caso O(n²))
+ *          - insertion sort en particiones pequeñas
+ *          - recursión optimizada en cola (pila O(log n) garantizada)
+ *      → Patrón clase con toString() (estilo Vehiculo / Soat) aplicado
+ *        a Pedido y Cliente.
+ *
+ *    Práctica 6 (Búsqueda):
+ *      → Búsqueda binaria recursiva por nombre en busqueda.js, útil
+ *        para consultar la posición de un cliente en el ranking.
+ */
 
-    registros.forEach(reg => {
-        const [customer, product, category, price, quantity, timestamp] = reg.trim().split(' ');
-        const subtotal = parseFloat(price) * parseInt(quantity);
+import { parsearCaso } from './Scripts/parser.js';
+import { Cliente } from './Scripts/Cliente.js';
+import { quickSort } from './Scripts/ordenamientos.js';
+import { comparadorClientes } from './Scripts/comparadores.js';
 
-        if (!resumenClientes[customer]) {
-            resumenClientes[customer] = {
-                totalSpent: 0,
-                categories: {},
-                favoriteCategory: ""
-            };
+export function calcularPedidos(caso) {
+    if (typeof caso !== 'string' || caso.length === 0) return '';
+
+    // 1) Parseo: string → Pedido[]                                  O(m·k)
+    const pedidos = parsearCaso(caso);
+    if (pedidos.length === 0) return '';
+
+    // 2) Acumulación por cliente.                                   O(m)
+    //    Hash directo (Object.create(null)) para inserción y lookup
+    //    O(1) amortizado. 'clientes' guarda el orden de aparición
+    //    para iterar sin recorrer el hash dos veces.
+    const indice = Object.create(null);
+    const clientes = [];
+    for (let i = 0; i < pedidos.length; i++) {
+        const ped = pedidos[i];
+        let cli = indice[ped.customer];
+        if (cli === undefined) {
+            cli = new Cliente(ped.customer);
+            indice[ped.customer] = cli;
+            clientes.push(cli);
         }
+        cli.registrarPedido(ped);
+    }
 
-        resumenClientes[customer].totalSpent += subtotal;
-        
-        resumenClientes[customer].categories[category] = (resumenClientes[customer].categories[category] || 0) + 1;
+    // 3) Cálculo de categoría favorita por cliente.                 O(n·p)
+    for (let i = 0; i < clientes.length; i++) {
+        clientes[i].calcularCategoriaFavorita();
+    }
+
+    // 4) Ordenamiento con QuickSort propio + comparador multi-criterio.
+    //                                                               O(n log n)
+    quickSort(clientes, 0, clientes.length - 1, comparadorClientes);
+
+    // 5) Formateo de salida según especificación del enunciado.     O(n·k)
+    let salida = '';
+    for (let i = 0; i < clientes.length; i++) {
+        salida += (i + 1) + ') ' + clientes[i].toString();
+        if (i < clientes.length - 1) salida += '\n';
+    }
+    return salida;
+}
+
+// -----------------------------------------------------------------------------
+// Exposición global para entornos navegador y enganche del botón "Calcular".
+// Permite que index.html invoque calcularPedidos sin reimportar el módulo
+// y mantiene compatibilidad con cualquier test runner que cargue util.js
+// como módulo y consuma window.calcularPedidos.
+// -----------------------------------------------------------------------------
+if (typeof window !== 'undefined') {
+    window.calcularPedidos = calcularPedidos;
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('btnCalcular');
+        const input = document.getElementById('inputCaso');
+        const output = document.getElementById('output');
+        if (btn && input && output) {
+            btn.addEventListener('click', () => {
+                output.innerText = calcularPedidos(input.value);
+            });
+        }
     });
-
-    const listaClientes = Object.keys(resumenClientes).map(name => {
-        const c = resumenClientes[name];
-        c.favoriteCategory = Object.keys(c.categories).reduce((a, b) => 
-            c.categories[a] >= c.categories[b] ? a : b);
-        return { name, ...c };
-    });
-
-    listaClientes.sort((a, b) => {
-        if (b.totalSpent !== a.totalSpent) return b.totalSpent - a.totalSpent;
-        if (b.favoriteCategory !== a.favoriteCategory) return b.favoriteCategory.localeCompare(a.favoriteCategory);
-        return a.name.localeCompare(b.name);
-    });
-
-    // 5. Formatear la salida 
-    return listaClientes.map((c, i) => `${i + 1}) ${c.name} ${c.totalSpent} ${c.favoriteCategory}`).join('\n');
 }

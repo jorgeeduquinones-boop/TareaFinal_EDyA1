@@ -2,22 +2,47 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Análisis de Pedidos</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Pedidos - Tarea Final EDyA1</title>
+    <script defer src="util.js" type="module"></script>
 </head>
 <body>
-    <h1>Analizador de Comercio Electrónico</h1>
-    <textarea id="inputCaso" rows="5" cols="50" placeholder="Pegue aquí el caso de prueba..."></textarea><br>
-    <button onclick="procesar()">Calcular</button>
-    <h3>Resultado:</h3>
-    <pre id="output"></pre>
+    <main>
+        <h1>Analizador de Comercio Electrónico</h1>
+        <p>
+            <small>
+                Tarea Final EDyA1 &mdash; Universidad Autónoma de Occidente &mdash;
+                2026-1 &mdash; Prof. Orlando Arboleda Molina, Msc.
+            </small>
+        </p>
 
-    <script src="util.js"></script>
-    <script>
-        function procesar() {
-            const entrada = document.getElementById('inputCaso').value;
-            const resultado = calcularPedidos(entrada);
-            document.getElementById('output').innerText = resultado;
-        }
-    </script>
+        <fieldset>
+            <legend>Caso de prueba</legend>
+            <p>
+                Formato:
+                <code>customer product category price quantity timestamp;</code>
+                ... (m records separados por <code>;</code>).
+            </p>
+            <textarea id="inputCaso" rows="10" cols="80"
+                placeholder="Ej: Joan Mouse Periferico 25000 2 2026-05-10; Ana Teclado Periferico 80000 1 2026-05-10; Joan Monitor Pantalla 950000 1 2026-05-10"></textarea>
+            <br><br>
+            <button id="btnCalcular">Calcular ranking</button>
+        </fieldset>
+
+        <fieldset>
+            <legend>Resultado (ranking)</legend>
+            <pre id="output">....</pre>
+        </fieldset>
+    </main>
+
+    <footer>
+        <p>
+            <small>
+                Implementación basada en las Prácticas 4 (Recursividad),
+                5 (Ordenamiento) y 6 (Búsqueda) del curso EDyA1.
+            </small>
+        </p>
+    </footer>
 </body>
 </html>

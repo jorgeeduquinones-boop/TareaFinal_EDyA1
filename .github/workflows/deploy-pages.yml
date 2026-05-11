@@ -1,4 +1,4 @@
-name: Deploy app to GitHub Pages
+name: Deploy Clientela to GitHub Pages
 
 on:
   push:
@@ -23,11 +23,25 @@ jobs:
       - name: Run tests
         run: node app/js/tests.js
 
+      - name: Prepare site
+        run: |
+          mkdir -p _site
+          # Copia todo el repo a _site/ excluyendo carpetas que no se sirven.
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='.pptx-build' \
+            --exclude='_site' \
+            ./ _site/
+          # Desactiva Jekyll para que GitHub Pages sirva los archivos tal cual.
+          touch _site/.nojekyll
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: app
+          path: _site
 
   deploy:
     needs: build

@@ -1,13 +1,13 @@
 {
-  "name": "E-Commerce Analytics — EDyA1",
-  "short_name": "Pedidos EDyA1",
-  "description": "Análisis de Pedidos en Comercio Electrónico — Tarea Final EDyA1, UAO 2026-1",
+  "name": "Clientela — Análisis de pedidos (EDyA1)",
+  "short_name": "Clientela",
+  "description": "Identifica tus clientes más valiosos a partir de tu historial de ventas. Tarea Final EDyA1, UAO 2026-1.",
   "start_url": "./inicio.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#0b0f17",
-  "theme_color": "#0b0f17",
+  "background_color": "#F8FAFC",
+  "theme_color": "#2563EB",
   "lang": "es",
   "icons": [
     {
