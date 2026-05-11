@@ -38,6 +38,12 @@ jobs:
           touch _site/.nojekyll
 
       - uses: actions/configure-pages@v5
+        with:
+          # Intenta activar GitHub Pages automáticamente si no está activado
+          # (requiere que GITHUB_TOKEN tenga permission pages:write, que ya
+          # se concede arriba). Si el repo no permite auto-activación, Jorge
+          # tendrá que hacerlo manual en Settings → Pages.
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
