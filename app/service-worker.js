@@ -5,7 +5,7 @@
 // (CDN). Si la red falla y no hay cache, intenta servir index.html como fallback.
 // =============================================================================
 
-const CACHE = 'clientela-edya1-v4';
+const CACHE = 'clientela-edya1-v5';
 const ASSETS = [
   './',
   './index.html',

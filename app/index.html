@@ -30,7 +30,7 @@
       <span class="spacer"></span>
       <span class="team-chip" title="Equipo">
         <svg class="lucide" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Joan Mateo Cardona
+        Equipo de 3
       </span>
       <a href="./inicio.html" class="icon-btn" title="Modo usuario final" aria-label="Modo usuario final">
         <svg class="lucide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/></svg>
@@ -266,8 +266,8 @@
               <div class="item-value">Orlando Arboleda Molina, Msc.</div>
             </div>
             <div class="item">
-              <div class="item-label">Autor</div>
-              <div class="item-value">Joan Mateo Cardona</div>
+              <div class="item-label">Equipo</div>
+              <div class="item-value">Joan Mateo Cardona · Danna Villegas · Jorge Eduardo Álvarez</div>
             </div>
             <div class="item">
               <div class="item-label">Entrega</div>
@@ -346,8 +346,14 @@
         <div class="doc-section">
           <h3>Decisiones de diseño</h3>
           <ul style="font-size:14px; line-height:1.8; padding-left:18px; color:var(--text);">
+            <li><strong>Dos implementaciones de <code>calcularPedidos</code>:</strong>
+              <ul>
+                <li><em>Dashboard</em> (<code>app/js/util.js</code>): MergeSort bottom-up estable — escogido por su garantía O(n log n) en peor caso y por habilitar comparación multi-criterio sin desempates secundarios.</li>
+                <li><em>Entregable académico</em> (<code>TareaFinal_EDyA1/util.js</code>): QuickSort recursivo con mediana de tres + Insertion Sort en particiones pequeñas — alineado con el esquema <code>particion_por_Nombre</code> / <code>quickSort_por_Nombre</code> de la Práctica 5, e incluye búsqueda binaria recursiva (Práctica 6) y funciones recursivas auxiliares (Práctica 4).</li>
+              </ul>
+            </li>
             <li><strong>Map vs Object plano:</strong> elegimos <code>Map</code> en producción por garantía O(1) sin reasignación de hash y por preservar orden de inserción.</li>
-            <li><strong>MergeSort vs QuickSort:</strong> usamos MergeSort en <code>calcularPedidos</code> porque es <em>estable</em> y soporta comparador multi-criterio sin re-ordenamientos. QuickSort 3-way queda como referencia en el benchmark.</li>
+            <li><strong>MergeSort vs QuickSort en el dashboard:</strong> MergeSort por ser <em>estable</em> y soportar comparador multi-criterio sin re-ordenamientos. QuickSort 3-way queda como referencia en el benchmark.</li>
             <li><strong>Parser carácter a carácter:</strong> evita crear strings intermedios masivos del doble <code>split</code> y baja presión sobre el GC en entradas grandes.</li>
             <li><strong>Empate en favoriteCategory:</strong> ante igual frecuencia, gana la categoría lexicográficamente mayor (consistente con el criterio 2 del ranking).</li>
           </ul>

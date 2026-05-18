@@ -238,14 +238,28 @@ calcularPedidos(caso);
 
 ## 🧮 Algoritmos implementados
 
-Todos en `app/js/algoritmos.js`, sin librerías externas:
+El proyecto tiene **dos implementaciones** de `calcularPedidos`, ambas con algoritmos vistos en clase:
+
+| Origen | Archivo | Algoritmo de orden | Por qué |
+|---|---|---|---|
+| Entregable académico | `TareaFinal_EDyA1/util.js` + `Scripts/ordenamientos.js` | **QuickSort recursivo** (mediana de tres + Insertion Sort en particiones pequeñas) | Sigue el esquema `particion_por_Nombre` / `quickSort_por_Nombre` de la Práctica 5 |
+| Dashboard PWA | `app/js/util.js` + `app/js/algoritmos.js` | **MergeSort bottom-up estable** | Garantiza O(n log n) en peor caso y habilita comparación multi-criterio sin desempates secundarios |
+
+El dashboard incluye además, en `app/js/algoritmos.js` y sin librerías externas:
 
 | Algoritmo | Tiempo | Espacio | Estable | Rol en el proyecto |
 |---|---|---|---|---|
-| **MergeSort** bottom-up | O(n log n) | O(n) | ✅ | Producción — ordena el ranking final |
+| **MergeSort** bottom-up | O(n log n) | O(n) | ✅ | Producción del dashboard — ordena el ranking final |
 | **QuickSort** 3-way (Dutch flag) | O(n log n) prom · O(n²) peor | O(log n) | ❌ | Comparativo en benchmark |
 | **RadixSort** LSD base 256 | O(d·n) | O(n+b) | ✅ | Demostrativo (sólo `totalSpent`) |
 | **Insertion Sort** | O(n²) peor · O(n) mejor | O(1) | ✅ | Baseline didáctico |
+
+El entregable académico añade además:
+
+| Archivo | Contenido | Práctica del curso |
+|---|---|---|
+| `Scripts/busqueda.js` | Búsqueda binaria recursiva por nombre + `consultarRanking` | Práctica 6 |
+| `Scripts/recursividad.js` | `sumaTotalRecursiva`, `contarClientesPremium`, `topClienteRecursivo` | Práctica 4 |
 
 Más utilidades:
 - `compararStrings(a, b)` — comparación lexicográfica O(min) sin `localeCompare`.
@@ -347,10 +361,18 @@ bubblewrap build
 ├── .github/workflows/deploy-pages.yml    ← CI/CD
 ├── docs/
 │   └── COMPLEJIDAD.md                    ← análisis detallado
-├── TareaFinal_EDyA1/                     ← entrega original (baseline preservado)
+├── TareaFinal_EDyA1/                     ← entregable académico modular
 │   ├── TareaFinal_EDyA1_2026_1.pdf
 │   ├── index.html
-│   └── util.js
+│   ├── util.js                           ← calcularPedidos con QuickSort recursivo
+│   └── Scripts/
+│       ├── Cliente.js                    ← clase con toString() (estilo Práctica 5)
+│       ├── Pedido.js
+│       ├── parser.js
+│       ├── comparadores.js               ← compararStrings + comparadorClientes
+│       ├── ordenamientos.js              ← QuickSort recursivo (Práctica 5)
+│       ├── busqueda.js                   ← búsqueda binaria recursiva (Práctica 6)
+│       └── recursividad.js               ← funciones recursivas (Práctica 4)
 └── app/                                  ← aplicación web desplegable
     ├── index.html                        ← dashboard (5 paneles)
     ├── manifest.json                     ← PWA manifest
@@ -406,9 +428,9 @@ El enunciado exige usar algoritmos vistos en clase. MergeSort:
 
 | Rol | Nombre | Código |
 |---|---|---|
-| Integrante 1 | _por completar_ | _por completar_ |
-| Integrante 2 | _por completar_ | _por completar_ |
-| Integrante 3 | _por completar_ | _por completar_ |
+| Integrante | Joan Mateo Cardona | _por completar_ |
+| Integrante | Danna Villegas | _por completar_ |
+| Integrante | Jorge Eduardo Álvarez | _por completar_ |
 
 **Curso**: Estructuras de Datos y Algoritmos 1 · UAO 2026-1
 **Docente**: Orlando Arboleda Molina, Msc.
