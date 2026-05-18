@@ -1,445 +1,312 @@
-<div align="center">
+# Análisis de Pedidos en Comercio Electrónico
 
-# 📊 E-Commerce Analytics
+**Tarea Final — Estructuras de Datos y Algoritmos 1**
+Universidad Autónoma de Occidente · Facultad de Ingeniería y Ciencias Básicas · 2026‑1
+Profesor: Orlando Arboleda Molina, Msc.
 
-**Análisis de Pedidos en Comercio Electrónico**
-*Tarea Final · Estructuras de Datos y Algoritmos 1 · UAO 2026-1*
+| Grupo EDyA1 | Integrantes | Código UAO |
+|---|---|---|
+| **1** | Joan Mateo Cardona | 2243431 |
+| | Danna Villegas | 2240027 |
+| | Jorge Eduardo Álvarez | 2230610 |
 
-[![Tests](https://img.shields.io/badge/tests-10%2F10%20passing-brightgreen)]()
-[![PWA](https://img.shields.io/badge/PWA-installable-blueviolet)]()
-[![Vanilla JS](https://img.shields.io/badge/Vanilla-JS-yellow)]()
-[![Sin dependencias](https://img.shields.io/badge/dependencies-0-success)]()
-[![Deploy](https://img.shields.io/badge/deploy-GitHub%20Pages-black)]()
-
-Aplicación web instalable como **PWA en Android e iOS** y exportable como **APK**, que resuelve el problema de ranking de clientes a partir de un alto volumen de transacciones de comercio electrónico, usando algoritmos de ordenamiento implementados desde cero.
-
-[Demo en vivo](#-demo-y-despliegue) · [Uso rápido](#-cómo-probar) · [Arquitectura](#-arquitectura) · [Complejidad](#-análisis-de-complejidad)
-
-</div>
+Repositorio: [`github.com/jorgeeduquinones-boop/TareaFinal_EDyA1`](https://github.com/jorgeeduquinones-boop/TareaFinal_EDyA1)
+Entrega: 17 de mayo de 2026 — 11:00 PM (UAOVirtual) · Sustentación: semana 16.
 
 ---
 
-## 📌 Tabla de contenidos
+## 1. Resumen del enunciado
 
-1. [Resumen del problema](#-resumen-del-problema)
-2. [Características](#-características)
-3. [Cómo probar](#-cómo-probar) ← *empieza aquí*
-4. [Arquitectura](#-arquitectura)
-5. [API: `calcularPedidos(caso)`](#-api-calcularpedidoscaso)
-6. [Algoritmos implementados](#-algoritmos-implementados)
-7. [Análisis de complejidad](#-análisis-de-complejidad)
-8. [Resultados de benchmark](#-resultados-de-benchmark)
-9. [Demo y despliegue](#-demo-y-despliegue)
-10. [Generar APK](#-generar-apk-android)
-11. [Estructura del repositorio](#-estructura-del-repositorio)
-12. [Decisiones de diseño](#-decisiones-de-diseño)
-13. [Equipo](#-equipo)
-
----
-
-## 🎯 Resumen del problema
-
-El comercio electrónico genera enormes volúmenes de transacciones. A partir de un string con `m` records (m ≥ 5):
+Dado un caso compuesto por `m` records (`m ≥ 5`) separados por punto y coma, donde cada record sigue el formato
 
 ```
-customer producto categoría precio cantidad timestamp;customer ...
+customer product category price quantity timestamp
 ```
 
-debemos producir un ranking de los `n` clientes únicos con su total gastado y su categoría favorita, ordenado por:
+la función `calcularPedidos(caso)` debe retornar el ranking de los `n` clientes únicos (`n ≥ 3`) en el formato:
 
-1. `totalSpent` ↓ *(descendente)*
-2. `favoriteCategory` ↓
-3. `customer` ↑ *(ascendente)*
+```
+[a]) customer [totalSpent] [favoriteCategory]
+```
 
-**Restricciones del enunciado:**
-- ✅ Función obligatoria `calcularPedidos(caso)` en `util.js`.
-- ✅ App web frontend o backend en JavaScript con datos iniciales de prueba.
-- ✅ Documento ≤5 páginas con análisis de complejidad en términos de `n`, `m`, `p`.
-- ✅ Uso de algoritmos vistos en clase (no `Array.sort` nativo).
+Criterios de orden:
 
----
+1. `totalSpent` descendente — suma de `price · quantity`.
+2. `favoriteCategory` descendente — categoría con más transacciones del cliente.
+3. `customer` ascendente — desempate final.
 
-## ✨ Características
+Restricciones del enunciado: la función debe estar escrita en `util.js`, debe usar algoritmos vistos en clase (Prácticas 4, 5 y 6) y el aplicativo debe correr en JavaScript sin errores de compilación.
 
-| | |
-|---|---|
-| 🧮 **Algoritmos propios** | MergeSort estable, QuickSort 3-way, RadixSort LSD, Insertion Sort. Cero dependencia del `sort` nativo. |
-| 📈 **Dashboard interactivo** | Métricas en vivo, ranking en tabla, gráficos con Chart.js, salida cruda en formato del enunciado. |
-| 🔬 **Benchmark integrado** | Compara los 5 algoritmos sobre escenarios m=1k–100k. Mide la fase de orden aislada. |
-| 🧪 **Suite de tests** | 10 tests automatizados que corren tanto en Node como en el navegador. |
-| 🎲 **Generador de casos** | LCG determinístico, parametrizado por (m, n, p, seed). |
-| 📦 **PWA instalable** | Manifest + Service Worker con cache offline. Instala como app nativa en Android/iOS. |
-| 📱 **Mobile-first** | Diseño responsive dark theme. Touch targets de ≥44px. |
-| 🚀 **Sin build step** | Vanilla JS, HTML, CSS. Cero `npm install`. Deploy directo a cualquier hosting estático. |
-| ⚙️ **CI/CD** | GitHub Actions corre los tests y despliega a Pages en cada push a `master`. |
+## 2. Estructura del proyecto
 
----
+El repositorio contiene **dos implementaciones** complementarias que comparten la misma especificación:
 
-## 🚀 Cómo probar
+| Carpeta | Audiencia | Propósito |
+|---|---|---|
+| `TareaFinal_EDyA1/` | Profesor / evaluador | Entregable académico. Misma estructura modular que las prácticas del curso. |
+| `app/` | Evaluador técnico / usuario | Aplicación web instalable (PWA) con dashboard, generador de casos, benchmark y suite de pruebas. |
 
-> **TL;DR**: para verlo funcionando en 30 segundos, abre `app/index.html` directamente en el navegador.
+Ambas resuelven el enunciado de forma idéntica; difieren únicamente en presentación y en el algoritmo de orden seleccionado (ver §4).
 
-### Opción 1 — Abrir el HTML directo *(más rápido, sin requisitos)*
+```
+.
+├── README.md
+├── index.html                            ← landing
+├── vercel.json
+├── .github/workflows/deploy-pages.yml    ← CI/CD a GitHub Pages
+├── docs/
+│   ├── Tarea_Final_EDyA1_Entregable.docx ← documento de entrega
+│   ├── COMPLEJIDAD.md                    ← análisis ampliado
+│   ├── TareaFinal_EDyA1_Presentacion.pptx
+│   └── _build_docx.py                    ← regenerador del .docx
+├── TareaFinal_EDyA1/                     ← entregable académico
+│   ├── TareaFinal_EDyA1_2026_1.pdf
+│   ├── index.html
+│   ├── util.js                           ← calcularPedidos (QuickSort recursivo)
+│   └── Scripts/
+│       ├── Pedido.js
+│       ├── Cliente.js                    ← clase con toString() (Práctica 5)
+│       ├── parser.js
+│       ├── comparadores.js
+│       ├── ordenamientos.js              ← QuickSort recursivo (Práctica 5)
+│       ├── busqueda.js                   ← búsqueda binaria recursiva (Práctica 6)
+│       └── recursividad.js               ← funciones recursivas (Práctica 4)
+├── app/                                  ← aplicación web (PWA)
+│   ├── index.html
+│   ├── inicio.html
+│   ├── manifest.json
+│   ├── service-worker.js
+│   ├── icons/icon.svg
+│   ├── css/
+│   └── js/
+│       ├── algoritmos.js                 ← MergeSort · QuickSort 3-way · Radix · Insertion
+│       ├── parser.js
+│       ├── util.js                       ← calcularPedidos (MergeSort estable)
+│       ├── generador.js                  ← LCG determinístico
+│       ├── benchmark.js
+│       ├── tests.js                      ← suite de pruebas
+│       ├── app.js
+│       ├── inicio.js
+│       └── icons.js
+└── clases/                               ← material de prácticas del curso
+```
+
+## 3. Cómo correr el proyecto
+
+### Entregable académico (`TareaFinal_EDyA1/`)
+
+`util.js` se carga como módulo ES, por lo que no funciona con `file://`. Servir por HTTP desde la raíz del repositorio:
 
 ```bash
-# Windows
-start app/index.html
-# macOS
-open app/index.html
-# Linux
-xdg-open app/index.html
+python3 -m http.server 8000
 ```
 
-La app carga el ejemplo del PDF automáticamente y muestra el ranking, métricas y gráfico.
+Abrir `http://localhost:8000/TareaFinal_EDyA1/` y usar el textarea para pegar un caso.
 
-> ⚠️ El Service Worker (modo offline) no se activa con `file://`. Para probar PWA completa, usa la Opción 2.
-
----
-
-### Opción 2 — Servidor estático local *(recomendado, prueba PWA)*
+### Dashboard PWA (`app/`)
 
 ```bash
-# Con Node (no requiere instalación previa)
+# Opción 1: servir solo la carpeta de la app
 npx http-server app -p 8080 -o
 
-# o con Python 3
-python -m http.server 8080 --directory app
+# Opción 2: servir todo el repo
+python3 -m http.server 8080
 ```
 
-Abre `http://localhost:8080`. En Chrome verás el botón **"Instalar app"** en el header → instalable como PWA.
+Abrir `http://localhost:8080/app/`. En Chrome aparece el botón **Instalar app** en el encabezado.
 
----
-
-### Opción 3 — Correr la suite de tests
+### Suite de pruebas
 
 ```bash
 node app/js/tests.js
 ```
 
-Salida esperada:
+Resultado esperado:
 
 ```
-  OK  Ejemplo del enunciado
-  OK  Empate totalSpent → favoriteCategory desc
-  OK  Empate doble → customer asc
-  OK  Acumulación price*quantity
-  OK  favoriteCategory = categoría con más transacciones
-  OK  Tolerancia a espacios extra y ; al final
-  OK  Ignora records mal formados
-  OK  String vacío → salida vacía
-  OK  Volumen 10k records sin errores
-  OK  Estabilidad: orden determinístico ante empates
+OK  Ejemplo del enunciado
+OK  Empate totalSpent → favoriteCategory desc
+OK  Empate doble → customer asc
+OK  Acumulación price*quantity
+OK  favoriteCategory = categoría con más transacciones
+OK  Tolerancia a espacios extra y ; al final
+OK  Ignora records mal formados
+OK  String vacío → salida vacía
+OK  Volumen 10k records sin errores
+OK  Estabilidad: orden determinístico ante empates
 
 10/10 pasaron, 0 fallaron.
 ```
 
-También puedes correr los tests desde la UI: tab **Tests → Correr tests**.
-
----
-
-### Opción 4 — Benchmark CLI
+### Benchmark
 
 ```bash
 node app/js/benchmark.js
 ```
 
-Compara MergeSort vs QuickSort vs Array.sort vs Insertion vs Radix sobre tres escenarios (1k / 10k / 100k records).
+Compara MergeSort, QuickSort 3‑way, RadixSort, Insertion Sort y `Array.sort` nativo sobre tres escenarios (1 000 / 10 000 / 100 000 records). Mide únicamente la fase de ordenamiento.
 
----
+## 4. Función `calcularPedidos(caso)`
 
-### Opción 5 — Probar con tus propios datos
-
-1. Abre la app, ve al tab **Datos**.
-2. Pega un caso en el textarea, o:
-3. Carga un CSV con cabecera `customer,product,category,price,quantity,timestamp`.
-4. O genera datos sintéticos con sliders de m, n, p, seed.
-5. Click en **Analizar**.
-
----
-
-### Opción 6 — Probar como app móvil (PWA)
-
-1. Despliega a GitHub Pages (ver [Demo y despliegue](#-demo-y-despliegue)).
-2. Abre la URL en Chrome móvil.
-3. Menú ⋮ → **"Agregar a pantalla de inicio"** → la app queda como un ícono más.
-4. Funciona offline después de la primera carga.
-
----
-
-## 🏗 Arquitectura
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                       UI (app.js)                            │
-│  Tabs: Análisis · Datos · Benchmark · Tests · Info           │
-└──────┬──────────────────────────────────────────┬───────────┘
-       │                                          │
-       ▼                                          ▼
-┌──────────────────┐                      ┌─────────────────┐
-│  calcularPedidos │ ←── núcleo del       │   Generador     │
-│    (util.js)     │     enunciado        │  (LCG seeded)   │
-└──────┬───────────┘                      └─────────────────┘
-       │ usa
-       ├───────────────┐
-       ▼               ▼
-┌─────────────┐  ┌──────────────────┐
-│   Parser    │  │   Algoritmos     │
-│ (scan O(L)) │  │ MergeSort/Quick/ │
-│             │  │ Radix/Insertion  │
-└─────────────┘  └──────────────────┘
-       ▲                  ▲
-       │                  │
-       └──────┬───────────┘
-              │
-       ┌──────┴────────┐         ┌──────────┐
-       │  Benchmark    │         │  Tests   │
-       │ (5 algos)     │         │  (10)    │
-       └───────────────┘         └──────────┘
-```
-
-**Sin dependencias en runtime**: solo Chart.js (CDN, opcional, no rompe sin él).
-**Sin build**: los `<script>` se cargan en orden directo desde HTML.
-
----
-
-## 📐 API: `calcularPedidos(caso)`
-
-### Firma
+Firma:
 
 ```js
 calcularPedidos(caso: string): string
 ```
 
-### Ejemplo
+Ejemplo del enunciado:
 
 ```js
-const caso = 'Customer1 Laptop Technology 3000 1 10;'
-           + 'Customer2 Shirt Clothing 50 2 12;'
-           + 'Customer1 Mouse Technology 100 1 15;'
-           + 'Customer2 Shoes Clothing 200 1 20;'
-           + 'Customer3 TV Technology 2500 1 25';
+const caso =
+  'Customer1 Laptop Technology 3000 1 10;' +
+  'Customer2 Shirt Clothing 50 2 12;' +
+  'Customer1 Mouse Technology 100 1 15;' +
+  'Customer2 Shoes Clothing 200 1 20;' +
+  'Customer3 TV Technology 2500 1 25';
 
 calcularPedidos(caso);
-// → '1) Customer1 3100 Technology
-//    2) Customer3 2500 Technology
-//    3) Customer2 300 Clothing'
+// '1) Customer1 3100 Technology
+//  2) Customer3 2500 Technology
+//  3) Customer2 300 Clothing'
 ```
 
-### Contrato
+Contrato:
 
-| | |
+| Aspecto | Descripción |
 |---|---|
-| **Entrada** | String con `m ≥ 5` records separados por `;`. Cada record: `customer product category price quantity timestamp`. |
-| **Salida** | String con `n` líneas: `[a]) customer [totalSpent] [favoriteCategory]`. |
-| **Orden** | (1) totalSpent ↓ · (2) favoriteCategory ↓ · (3) customer ↑ |
-| **Tolerancia** | Espacios extra, `;` final, records mal formados se ignoran sin lanzar excepción. |
+| Entrada | String con `m ≥ 5` records separados por `;`. |
+| Salida | String con `n` líneas en formato `[a]) customer [totalSpent] [favoriteCategory]`. |
+| Orden | (1) `totalSpent` descendente · (2) `favoriteCategory` descendente · (3) `customer` ascendente. |
+| Robustez | Records mal formados, espacios extra y `;` final se ignoran sin lanzar excepción. |
 
----
+## 5. Algoritmos implementados
 
-## 🧮 Algoritmos implementados
+Las dos versiones de `calcularPedidos` usan algoritmos vistos en clase, sin recurrir a `Array.sort`:
 
-El proyecto tiene **dos implementaciones** de `calcularPedidos`, ambas con algoritmos vistos en clase:
-
-| Origen | Archivo | Algoritmo de orden | Por qué |
+| Implementación | Archivo | Ordenamiento | Justificación |
 |---|---|---|---|
-| Entregable académico | `TareaFinal_EDyA1/util.js` + `Scripts/ordenamientos.js` | **QuickSort recursivo** (mediana de tres + Insertion Sort en particiones pequeñas) | Sigue el esquema `particion_por_Nombre` / `quickSort_por_Nombre` de la Práctica 5 |
-| Dashboard PWA | `app/js/util.js` + `app/js/algoritmos.js` | **MergeSort bottom-up estable** | Garantiza O(n log n) en peor caso y habilita comparación multi-criterio sin desempates secundarios |
+| Entregable académico | `TareaFinal_EDyA1/util.js` + `Scripts/ordenamientos.js` | QuickSort recursivo con mediana de tres + Insertion Sort en particiones pequeñas | Sigue el esquema `particion_por_Nombre` / `quickSort_por_Nombre` de la Práctica 5. |
+| Dashboard PWA | `app/js/util.js` + `app/js/algoritmos.js` | MergeSort bottom‑up estable | Garantiza `O(n log n)` en el peor caso y permite comparación multi‑criterio sin desempates secundarios. |
 
-El dashboard incluye además, en `app/js/algoritmos.js` y sin librerías externas:
+El entregable incluye además los módulos de las Prácticas 4 y 6 expuestos desde `util.js`:
 
-| Algoritmo | Tiempo | Espacio | Estable | Rol en el proyecto |
-|---|---|---|---|---|
-| **MergeSort** bottom-up | O(n log n) | O(n) | ✅ | Producción del dashboard — ordena el ranking final |
-| **QuickSort** 3-way (Dutch flag) | O(n log n) prom · O(n²) peor | O(log n) | ❌ | Comparativo en benchmark |
-| **RadixSort** LSD base 256 | O(d·n) | O(n+b) | ✅ | Demostrativo (sólo `totalSpent`) |
-| **Insertion Sort** | O(n²) peor · O(n) mejor | O(1) | ✅ | Baseline didáctico |
-
-El entregable académico añade además:
-
-| Archivo | Contenido | Práctica del curso |
+| Módulo | Función | Práctica |
 |---|---|---|
-| `Scripts/busqueda.js` | Búsqueda binaria recursiva por nombre + `consultarRanking` | Práctica 6 |
-| `Scripts/recursividad.js` | `sumaTotalRecursiva`, `contarClientesPremium`, `topClienteRecursivo` | Práctica 4 |
+| `Scripts/busqueda.js` | `busquedaBinariaPorNombre` (recursiva), `consultarRanking` | 6 |
+| `Scripts/recursividad.js` | `sumaTotalRecursiva`, `contarClientesPremium`, `topClienteRecursivo` | 4 |
 
-Más utilidades:
-- `compararStrings(a, b)` — comparación lexicográfica O(min) sin `localeCompare`.
-- `comparadorClientes(a, b)` — encapsula los 3 criterios del enunciado.
+Las utilidades `posicionDeCliente(ranking, name)` y `resumenAgregado(ranking, umbral)` exportadas por `util.js` aplican estos módulos sobre el ranking ya calculado.
 
----
+El dashboard expone cuatro ordenamientos propios para el benchmark:
 
-## 📊 Análisis de complejidad
+| Algoritmo | Tiempo | Espacio | Estable | Uso |
+|---|---|---|---|---|
+| MergeSort bottom‑up | `O(n log n)` | `O(n)` | Sí | Producción del dashboard |
+| QuickSort 3‑way (Dutch flag) | `O(n log n)` prom · `O(n²)` peor | `O(log n)` | No | Comparativo |
+| RadixSort LSD base 256 | `O(d · n)` | `O(n + b)` | Sí | Demostrativo (solo `totalSpent`) |
+| Insertion Sort | `O(n²)` peor · `O(n)` mejor | `O(1)` | Sí | Baseline didáctico |
 
-Sea **m** = #records, **n** = #customers, **p** = #categorías, **k** = longitud media de campo.
+## 6. Análisis de complejidad
+
+Sean `m` = número de records, `n` = número de clientes únicos, `p` = número de categorías, `k` = longitud media de un campo.
 
 | Fragmento | Tiempo | Espacio |
 |---|---|---|
-| `parsearCaso(caso)` | O(m·k) | O(m) |
-| Acumulación por cliente (`Map`) | O(m) | O(n·p) |
-| Cálculo de `favoriteCategory` | O(n·p) | — |
-| `mergeSort(clientes, cmp)` | O(n log n) | O(n) |
-| Formateo + `join` | O(n·k) | O(n·k) |
+| `parsearCaso(caso)` | `O(m · k)` | `O(m)` |
+| Acumulación por cliente | `O(m)` | `O(n · p)` |
+| Cálculo de `favoriteCategory` | `O(n · p)` | — |
+| Ordenamiento (QuickSort o MergeSort) | `O(n log n)` | `O(log n)` o `O(n)` |
+| Formateo de salida | `O(n · k)` | `O(n · k)` |
 
-**Total temporal**: `O(m·k + n·p + n log n + n·k)` ≈ **`O(m + n·p + n log n)`** asumiendo `k` constante.
+**Complejidad temporal total:** `O(m·k + n·p + n log n)` ≈ `O(m + n·p + n log n)` asumiendo `k` constante.
+**Complejidad espacial total:** `O(m + n·p)`.
 
-**Total espacial**: `O(m + n·p)`.
+Análisis ampliado en [`docs/COMPLEJIDAD.md`](docs/COMPLEJIDAD.md).
 
-> Análisis detallado en [`docs/COMPLEJIDAD.md`](docs/COMPLEJIDAD.md).
+## 7. Resultados de benchmark
 
----
-
-## ⏱ Resultados de benchmark
-
-Mediciones reales con `node app/js/benchmark.js` en escenario realista:
+Mediciones obtenidas con `node app/js/benchmark.js` sobre un escenario de 100 000 records y 2 000 clientes:
 
 ```
 == m=100000, n=2000, p=10 → 2000 clientes ==
-   1.482 ms  MergeSort propio (estable)        ← producción
+   1.482 ms  MergeSort propio (estable)
    1.479 ms  QuickSort 3-way propio
    0.384 ms  Array.sort nativo (V8 — TimSort en C++)
    6.095 ms  Insertion Sort propio
-   1.128 ms  RadixSort LSD (sólo criterio 1)
+   1.128 ms  RadixSort LSD (solo criterio 1)
 ```
 
-**Conclusión**: nuestro MergeSort propio es **competitivo** (~4× más lento que el nativo de C++, esperable). Para volúmenes ≤100k registros, el cuello de botella **no** es el orden sino el parseo.
+El MergeSort propio se mantiene competitivo: aproximadamente cuatro veces más lento que `Array.sort` nativo (compilado en C++), lo cual es esperado al implementar el algoritmo en JavaScript puro. Para volúmenes de hasta 100 000 records el cuello de botella real es el parseo, no el ordenamiento.
 
----
-
-## 🌐 Demo y despliegue
-
-### GitHub Pages (configurado y automático)
-
-El workflow `.github/workflows/deploy-pages.yml` despliega `app/` en cada push a `master`.
-
-**Activación (una sola vez)**:
-
-1. Ir a `Settings → Pages` del repo.
-2. En **Source** seleccionar **"GitHub Actions"**.
-3. Guardar.
-
-**URL final**: `https://jorgeeduquinones-boop.github.io/TareaFinal_EDyA1/`
-
-### Otros hostings (opcional)
-
-| Plataforma | Comando / Config |
-|---|---|
-| **Vercel** | Importar repo · Root Dir: `app` · Framework: Other |
-| **Netlify** | Importar repo · Publish dir: `app` |
-| **Cloudflare Pages** | Importar repo · Build output: `app` |
-| **Firebase Hosting** | `firebase init hosting` con `public: app` |
-
----
-
-## 📱 Generar APK (Android)
-
-La app es PWA estándar, así que cualquier empaquetador funciona:
-
-### Opción A — PWABuilder *(sin código, recomendado)*
-
-1. Visitar https://www.pwabuilder.com.
-2. Pegar la URL pública de la app.
-3. **Package for stores → Android**.
-4. Descargar la APK firmada.
-
-> PWABuilder genera automáticamente los iconos PNG en todas las resoluciones a partir del `icon.svg`.
-
-### Opción B — Bubblewrap CLI *(oficial de Google)*
-
-```bash
-npm i -g @bubblewrap/cli
-bubblewrap init --manifest=https://<url>/manifest.json
-bubblewrap build
-```
-
----
-
-## 📁 Estructura del repositorio
+## 8. Arquitectura del proyecto
 
 ```
-.
-├── README.md
-├── vercel.json
-├── .github/workflows/deploy-pages.yml    ← CI/CD
-├── docs/
-│   └── COMPLEJIDAD.md                    ← análisis detallado
-├── TareaFinal_EDyA1/                     ← entregable académico modular
-│   ├── TareaFinal_EDyA1_2026_1.pdf
-│   ├── index.html
-│   ├── util.js                           ← calcularPedidos con QuickSort recursivo
-│   └── Scripts/
-│       ├── Cliente.js                    ← clase con toString() (estilo Práctica 5)
-│       ├── Pedido.js
-│       ├── parser.js
-│       ├── comparadores.js               ← compararStrings + comparadorClientes
-│       ├── ordenamientos.js              ← QuickSort recursivo (Práctica 5)
-│       ├── busqueda.js                   ← búsqueda binaria recursiva (Práctica 6)
-│       └── recursividad.js               ← funciones recursivas (Práctica 4)
-└── app/                                  ← aplicación web desplegable
-    ├── index.html                        ← dashboard (5 paneles)
-    ├── manifest.json                     ← PWA manifest
-    ├── service-worker.js                 ← cache offline
-    ├── 404.html
-    ├── icons/icon.svg
-    ├── css/styles.css                    ← dark theme · mobile-first
-    └── js/
-        ├── algoritmos.js                 ← MergeSort · Quick · Radix · Insertion
-        ├── parser.js                     ← scan O(L)
-        ├── util.js                       ← calcularPedidos (REQUERIDA)
-        ├── generador.js                  ← LCG seeded
-        ├── benchmark.js                  ← compara 5 algoritmos
-        ├── tests.js                      ← 10 tests (Node + browser)
-        └── app.js                        ← UI logic
+                ┌──────────────────────────────────┐
+                │           UI (app.js)            │
+                │  Tabs: Resultados · Datos ·      │
+                │  Benchmark · Tests · Docs        │
+                └──────┬───────────────────┬───────┘
+                       │                   │
+                       ▼                   ▼
+              ┌─────────────────┐   ┌────────────────┐
+              │ calcularPedidos │   │   Generador    │
+              │   (util.js)     │   │ (LCG seeded)   │
+              └────┬────────────┘   └────────────────┘
+                   │
+         ┌─────────┼─────────────┐
+         ▼         ▼             ▼
+   ┌───────────┐ ┌──────────────────┐ ┌───────────────┐
+   │  Parser   │ │   Algoritmos     │ │ Comparadores  │
+   │ (scan L)  │ │ MergeSort/Quick/ │ │   y orden     │
+   │           │ │ Radix/Insertion  │ │  multi‑crit.  │
+   └───────────┘ └──────────────────┘ └───────────────┘
+                   ▲                ▲
+                   └──────┬─────────┘
+                          │
+                  ┌───────┴────────┐    ┌──────────┐
+                  │   Benchmark    │    │  Tests   │
+                  │  (5 algoritmos)│    │   (10)   │
+                  └────────────────┘    └──────────┘
 ```
 
----
+Sin dependencias en runtime salvo Chart.js (cargado desde CDN, no rompe si falla). Sin paso de build: los `<script>` se cargan en orden directo desde HTML.
 
-## 🧠 Decisiones de diseño
+## 9. Decisiones de diseño
 
-### 1. `favoriteCategory` = categoría con más **transacciones**
+**Definición de `favoriteCategory`.** Se interpretó "categoría en la que más compras realizó" como el número de transacciones (un record = una compra), no la suma de `quantity` ni del gasto. En el ejemplo del enunciado las tres interpretaciones coinciden; esta es la más sencilla de defender. En caso de empate por frecuencia, gana la categoría lexicográficamente mayor, consistente con el criterio 2 del orden global.
 
-Interpretamos "categoría en la que más compras realizó" como número de records (= transacciones), no suma de `quantity` ni gasto. **Justificación**: una compra = una transacción. En el ejemplo del PDF las tres interpretaciones coinciden, así que esta es la más simple y defendible.
+**MergeSort en el dashboard.** El enunciado exige usar algoritmos vistos en clase. MergeSort garantiza `O(n log n)` en el peor caso, es estable, y soporta comparación multi‑criterio sin reordenamientos sucesivos.
 
-**Empate de frecuencia** → gana la categoría lexicográficamente mayor (consistente con el criterio 2 del orden global).
+**QuickSort en el entregable académico.** El esquema `particion_por_Nombre` / `quickSort_por_Nombre` de la Práctica 5 es el patrón canónico del curso. Se añadieron tres mejoras: pivote por mediana de tres, cambio a Insertion Sort en particiones menores a 16 elementos, y recursión optimizada en cola para garantizar profundidad de pila `O(log n)`.
 
-### 2. MergeSort estable como ordenamiento de producción
+**Parser sin `String.split`.** Un `split(';')` seguido de un `split(' ')` por record genera aproximadamente `7m` strings intermedios. El parser hace un único scan carácter a carácter en `O(L)` con asignaciones mínimas.
 
-El enunciado exige usar algoritmos vistos en clase. MergeSort:
-- Garantiza O(n log n) en el peor caso (vs QuickSort O(n²) peor).
-- Es **estable** → la implementación bottom-up con un solo comparador multi-criterio es eficiente y predecible.
+**Hash por inserción.** Tanto `Map` (dashboard) como `Object.create(null)` (entregable) garantizan `O(1)` amortizado para inserción y lookup, además de preservar el orden de aparición de los clientes.
 
-### 3. Parser sin `String.split`
+**Vanilla JavaScript, sin paso de build.** El proyecto no requiere `npm install`. Cualquier hosting estático lo sirve sin configuración y el evaluador puede leer el código fuente sin bundlers de por medio.
 
-`split(';')` seguido de `split(' ')` por record genera ~7m strings intermedios y dispara presión de GC. El scan manual carácter a carácter es O(L) con asignaciones mínimas (solo `m` strings finales).
+## 10. Despliegue
 
-### 4. Vanilla JS, sin build step
+### GitHub Pages (automático)
 
-- Cero `package.json` → cero `npm install` → cero supply chain.
-- Cualquier hosting estático lo sirve sin configuración.
-- El profe puede leer todo el código sin pelearse con bundlers.
+`.github/workflows/deploy-pages.yml` ejecuta la suite de pruebas y publica el repositorio en cada push a `master`. La configuración inicial requiere activar GitHub Pages una sola vez en *Settings → Pages → Source → GitHub Actions*.
 
-### 5. PWA sobre Capacitor/React Native
+URL pública: `https://jorgeeduquinones-boop.github.io/TareaFinal_EDyA1/`
 
-- Una sola codebase corre en web + Android + iOS.
-- Sin SDKs nativos, sin Android Studio, sin Xcode.
-- Instalable directamente desde el navegador.
+### Vercel
 
----
+`vercel.json` configura el repositorio como sitio estático (sin paso de build), con cabeceras correctas para el service worker y el manifest PWA. Importar el repositorio en Vercel y dejar las opciones por defecto.
 
-## 👥 Equipo
+## 11. Documento de entrega
 
-| Rol | Nombre | Código |
-|---|---|---|
-| Integrante | Joan Mateo Cardona | _por completar_ |
-| Integrante | Danna Villegas | _por completar_ |
-| Integrante | Jorge Eduardo Álvarez | _por completar_ |
+El documento Word exigido por el enunciado se encuentra en `docs/Tarea_Final_EDyA1_Entregable.docx`. Su contenido sigue la estructura solicitada:
 
-**Curso**: Estructuras de Datos y Algoritmos 1 · UAO 2026-1
-**Docente**: Orlando Arboleda Molina, Msc.
-**Entrega**: 17 de mayo de 2026, 11pm · UAOVirtual.
+1. Portada con códigos, nombres, grupo, asignatura, facultad y profesor.
+2. Resumen del enunciado en un párrafo (≤10 líneas).
+3. Pseudocódigo de `calcularPedidos(caso)` con las complejidades individuales en columna lateral.
+4. Tabla de complejidad total con justificación.
+5. Complejidad espacial.
+6. Algoritmos del curso aplicados (Prácticas 4, 5, 6).
+7. Verificación con el caso del enunciado.
 
----
-
-<div align="center">
-
-*Construido con HTML, CSS y JavaScript puro. Sin frameworks. Sin excusas.*
-
-</div>
+El documento puede regenerarse con `python3 docs/_build_docx.py` tras editar el script.
