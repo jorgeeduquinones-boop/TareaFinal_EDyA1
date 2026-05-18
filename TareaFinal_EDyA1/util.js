@@ -25,7 +25,7 @@
  *    Parseo (parser.js)               →  O(m · k)
  *    Acumulación por cliente          →  O(m)        [hash O(1) amortiz.]
  *    Cálculo categoría favorita       →  O(n · p)
- *    QuickSort propio (ord.js)        →  O(n log n)  promedio
+ *    QuickSort propio (ordenamientos.js) →  O(n log n) promedio
  *    Formateo de salida               →  O(n · k)
  *    ────────────────────────────────────────────
  *    TOTAL                            →  O(m + n·p + n log n)
@@ -55,7 +55,9 @@
 import { parsearCaso } from './Scripts/parser.js';
 import { Cliente } from './Scripts/Cliente.js';
 import { quickSort } from './Scripts/ordenamientos.js';
-import { comparadorClientes } from './Scripts/comparadores.js';
+import { comparadorClientes, compararStrings } from './Scripts/comparadores.js';
+import { busquedaBinariaPorNombre, consultarRanking } from './Scripts/busqueda.js';
+import { sumaTotalRecursiva, contarClientesPremium, topClienteRecursivo } from './Scripts/recursividad.js';
 
 export function calcularPedidos(caso) {
     if (typeof caso !== 'string' || caso.length === 0) return '';
@@ -100,6 +102,57 @@ export function calcularPedidos(caso) {
 }
 
 // -----------------------------------------------------------------------------
+// rankingPorNombre(ranking)
+//   Re-ordena el ranking alfabéticamente por nombre (precondición para
+//   poder aplicar la búsqueda binaria recursiva de la Práctica 6).
+//   Reusa el mismo QuickSort recursivo + un comparador por nombre.
+//   Complejidad: O(n log n).
+// -----------------------------------------------------------------------------
+export function rankingPorNombre(ranking) {
+    const copia = ranking.slice();
+    quickSort(copia, 0, copia.length - 1, (a, b) => compararStrings(a.name, b.name));
+    return copia;
+}
+
+// -----------------------------------------------------------------------------
+// posicionDeCliente(ranking, name)
+//   Búsqueda binaria recursiva (Práctica 6) para localizar un cliente
+//   dentro del ranking ya calculado. Devuelve la posición 1-indexada en
+//   el ranking original (no en el arreglo ordenado por nombre).
+//   Complejidad: O(n log n) reordenando + O(log n) buscando.
+// -----------------------------------------------------------------------------
+export function posicionDeCliente(ranking, name) {
+    if (!ranking || ranking.length === 0) return -1;
+    const porNombre = rankingPorNombre(ranking);
+    const i = busquedaBinariaPorNombre(porNombre, 0, porNombre.length - 1, name);
+    if (i < 0) return -1;
+    const cliente = porNombre[i];
+    for (let j = 0; j < ranking.length; j++) {
+        if (ranking[j] === cliente) return j + 1;
+    }
+    return -1;
+}
+
+// -----------------------------------------------------------------------------
+// resumenAgregado(ranking, umbralPremium = 0)
+//   Aplica las tres funciones recursivas de la Práctica 4 sobre el
+//   ranking ya calculado: suma total, conteo de clientes premium y
+//   búsqueda del cliente top. Se ofrece como utilidad de verificación.
+//   Complejidad: O(n) tiempo, O(n) espacio (pila de recursión).
+// -----------------------------------------------------------------------------
+export function resumenAgregado(ranking, umbralPremium) {
+    if (!ranking || ranking.length === 0) {
+        return { totalGastado: 0, clientesPremium: 0, topCliente: null };
+    }
+    const umbral = typeof umbralPremium === 'number' ? umbralPremium : 0;
+    return {
+        totalGastado: sumaTotalRecursiva(ranking, 0),
+        clientesPremium: contarClientesPremium(ranking, 0, umbral),
+        topCliente: topClienteRecursivo(ranking, 0, null),
+    };
+}
+
+// -----------------------------------------------------------------------------
 // Exposición global para entornos navegador y enganche del botón "Calcular".
 // Permite que index.html invoque calcularPedidos sin reimportar el módulo
 // y mantiene compatibilidad con cualquier test runner que cargue util.js
@@ -107,6 +160,9 @@ export function calcularPedidos(caso) {
 // -----------------------------------------------------------------------------
 if (typeof window !== 'undefined') {
     window.calcularPedidos = calcularPedidos;
+    window.posicionDeCliente = posicionDeCliente;
+    window.resumenAgregado = resumenAgregado;
+    window.consultarRanking = consultarRanking;
     document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('btnCalcular');
         const input = document.getElementById('inputCaso');
