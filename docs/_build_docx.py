@@ -121,6 +121,11 @@ p_repo.alignment = WD_ALIGN_PARAGRAPH.CENTER
 p_repo.add_run("Repositorio: ").bold = True
 p_repo.add_run("github.com/jorgeeduquinones-boop/TareaFinal_EDyA1").italic = True
 
+p_demo = doc.add_paragraph()
+p_demo.alignment = WD_ALIGN_PARAGRAPH.CENTER
+p_demo.add_run("Demo en vivo: ").bold = True
+p_demo.add_run("https://tarea-final-e-dy-a1.vercel.app/app/index.html").italic = True
+
 # Salto de página → contenido en página 2
 doc.add_page_break()
 
@@ -282,6 +287,94 @@ ej.paragraph_format.left_indent = Cm(0.8)
 r = ej.add_run("1) Customer1 3100 Technology\n2) Customer3 2500 Technology\n3) Customer2 300 Clothing")
 r.font.name = "Consolas"
 r.font.size = Pt(10)
+
+# =============================================================================
+# 7. APLICATIVO WEB
+# =============================================================================
+add_heading("7. Aplicativo web entregado", size=13, space_before=10, space_after=4)
+add_para(
+    "Además del entregable académico en TareaFinal_EDyA1/, el proyecto "
+    "incluye una aplicación web (PWA) desplegada en Vercel y accesible "
+    "desde https://tarea-final-e-dy-a1.vercel.app/app/index.html. La app "
+    "organiza la solución en cinco paneles: Resultados muestra el ranking "
+    "obtenido por calcularPedidos junto con métricas y gráficos; Cargar "
+    "caso permite pegar texto, subir un CSV o generar un caso sintético "
+    "reproducible con (m, n, p, seed); Benchmark contrasta empíricamente "
+    "MergeSort, QuickSort 3-way, RadixSort, Insertion Sort y Array.sort "
+    "nativo sobre el mismo dataset; Pruebas ejecuta la suite "
+    "automatizada; y Documentación reúne el análisis de complejidad y "
+    "las decisiones de diseño.",
+    size=11, space_after=6,
+)
+
+# =============================================================================
+# 8. SUITE DE PRUEBAS
+# =============================================================================
+add_heading("8. Suite de pruebas automatizada", size=13, space_before=4, space_after=4)
+add_para(
+    "El archivo app/js/tests.js corre tanto en Node (node app/js/tests.js) "
+    "como en la pestaña Pruebas del dashboard, y valida diez escenarios:",
+    size=11, space_after=2,
+)
+
+tests = [
+    "Ejemplo exacto del enunciado.",
+    "Empate en totalSpent → desempate por favoriteCategory descendente.",
+    "Empate doble → desempate por customer ascendente.",
+    "Acumulación correcta de price · quantity.",
+    "favoriteCategory equivale a la categoría con más transacciones.",
+    "Tolerancia a espacios extra y a ‘;’ final.",
+    "Records mal formados se ignoran sin lanzar excepción.",
+    "String vacío produce salida vacía.",
+    "Volumen alto: 10 000 records procesados sin desbordar la pila.",
+    "Estabilidad: orden determinístico ante empates totales.",
+]
+for t in tests:
+    p = doc.add_paragraph(style="List Number")
+    p.paragraph_format.space_after = Pt(0)
+    p.add_run(t).font.size = Pt(10.5)
+
+add_para(
+    "Resultado actual: 10/10 pruebas pasan. La integración continua "
+    "(.github/workflows/deploy-pages.yml) las ejecuta antes de cada "
+    "despliegue, garantizando que sólo versiones verificadas llegan a "
+    "producción.",
+    size=11, space_after=6,
+)
+
+# =============================================================================
+# 9. DECISIONES DE DISEÑO
+# =============================================================================
+add_heading("9. Decisiones de diseño relevantes", size=13, space_before=4, space_after=4)
+add_para(
+    "Interpretación de favoriteCategory. Se eligió la categoría con mayor "
+    "número de transacciones (un record = una compra), no la suma de "
+    "quantity ni del gasto. En el ejemplo del enunciado las tres "
+    "interpretaciones coinciden, pero ésta es la más simple de defender "
+    "y la única que respeta literalmente el texto ‘en la que más "
+    "compras realizó’. Empates por frecuencia se rompen escogiendo la "
+    "categoría lexicográficamente mayor, consistente con el criterio 2 "
+    "del orden global.",
+    size=11, space_after=4,
+)
+add_para(
+    "QuickSort frente a MergeSort. El entregable académico usa QuickSort "
+    "recursivo siguiendo el esquema particion_por_Nombre de la Práctica "
+    "5, con mediana de tres, cambio a Insertion Sort en particiones "
+    "pequeñas (umbral 16) y recursión optimizada en cola para mantener "
+    "la pila en O(log n). El dashboard usa MergeSort bottom-up estable "
+    "para garantizar O(n log n) en el peor caso y permitir comparación "
+    "multi-criterio sin desempates secundarios. Ambas variantes resuelven "
+    "el mismo enunciado y producen idéntica salida.",
+    size=11, space_after=4,
+)
+add_para(
+    "Parser carácter a carácter. Evita el doble split tradicional que "
+    "genera del orden de 7·m strings intermedios y presión de "
+    "recolección de basura. El scan es O(L) donde L = m·k, con "
+    "asignaciones mínimas.",
+    size=11, space_after=2,
+)
 
 doc.save(OUT)
 print(f"OK: {OUT}")

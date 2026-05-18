@@ -10,8 +10,9 @@ Profesor: Orlando Arboleda Molina, Msc.
 | | Danna Villegas | 2240027 |
 | | Jorge Eduardo Álvarez | 2230610 |
 
-Repositorio: [`github.com/jorgeeduquinones-boop/TareaFinal_EDyA1`](https://github.com/jorgeeduquinones-boop/TareaFinal_EDyA1)
-Entrega: 17 de mayo de 2026 — 11:00 PM (UAOVirtual) · Sustentación: semana 16.
+**Demo en vivo:** [`tarea-final-e-dy-a1.vercel.app/app/index.html`](https://tarea-final-e-dy-a1.vercel.app/app/index.html)
+**Repositorio:** [`github.com/jorgeeduquinones-boop/TareaFinal_EDyA1`](https://github.com/jorgeeduquinones-boop/TareaFinal_EDyA1)
+**Entrega:** 17 de mayo de 2026 — 11:00 PM (UAOVirtual) · Sustentación: semana 16.
 
 ---
 
@@ -295,7 +296,11 @@ URL pública: `https://jorgeeduquinones-boop.github.io/TareaFinal_EDyA1/`
 
 ### Vercel
 
-`vercel.json` configura el repositorio como sitio estático (sin paso de build), con cabeceras correctas para el service worker y el manifest PWA. Importar el repositorio en Vercel y dejar las opciones por defecto.
+`vercel.json` configura el repositorio como sitio estático (sin paso de build), con cabeceras correctas para el service worker y el manifest PWA. El despliegue está activo en:
+
+```
+https://tarea-final-e-dy-a1.vercel.app/app/index.html
+```
 
 ## 11. Documento de entrega
 
