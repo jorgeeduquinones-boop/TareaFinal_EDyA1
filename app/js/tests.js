@@ -95,6 +95,18 @@
     assertEq(calcularPedidos(caso), '1) A 10 Books\n2) B 10 Books\n3) C 10 Books');
   });
 
+  // ------- Formato extendido del profesor: 'CatA,CatB--records' -------
+  test('Formato del profesor con prefijo de categorías', () => {
+    const base = 'Customer1 Laptop Technology 3000 1 10;Customer2 Shirt Clothing 50 2 12;'
+               + 'Customer1 Mouse Technology 100 1 15;Customer2 Shoes Clothing 200 1 20;'
+               + 'Customer3 TV Technology 2500 1 25';
+    const extendido = "'Technology,Clothing--" + base + "'";
+    const esperado = '1) Customer1 3100 Technology\n2) Customer3 2500 Technology\n3) Customer2 300 Clothing';
+    assertEq(calcularPedidos(extendido), esperado);
+    // El formato sin categorías declaradas debe seguir funcionando igual.
+    assertEq(calcularPedidos(base), esperado);
+  });
+
   function correr(log) {
     log = log || ((...a) => console.log(...a));
     let ok = 0, fail = 0;

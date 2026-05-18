@@ -151,6 +151,19 @@
 
       <div class="card">
         <div class="card-header">
+          <h2>Casos del profesor</h2>
+        </div>
+        <p style="color:var(--text-muted); font-size:14px; margin:0 0 14px;">
+          Carga los tres casos de prueba publicados por el docente en <code>data_2026_1/</code>.
+          Aceptan el formato extendido <code>'Cat1,…,CatN--records'</code> que precede el listado
+          de categorías al cuerpo de records.
+        </p>
+        <div id="casosProfe" class="prof-cases"></div>
+        <p id="profInfo" style="font-size:13px; color:var(--text-muted); margin-top:10px;"></p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
           <h2>Generar caso sintético</h2>
         </div>
         <p style="color:var(--text-muted); font-size:14px; margin:0 0 14px;">
@@ -229,7 +242,7 @@
       <div class="card">
         <div class="card-header">
           <h2>Suite de pruebas automatizadas</h2>
-          <span id="testSummary" class="chip">10 pruebas pendientes</span>
+          <span id="testSummary" class="chip">11 pruebas pendientes</span>
         </div>
         <p style="color:var(--text-muted); font-size:14px; margin:0 0 14px;">
           Verifica correctitud sobre el ejemplo del enunciado, desempates en <code>totalSpent</code> y <code>favoriteCategory</code>, robustez frente a entrada mal formada, estabilidad del ordenamiento y volumen alto (10.000 records).

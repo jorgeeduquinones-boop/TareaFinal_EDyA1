@@ -89,8 +89,14 @@ Ambas resuelven el enunciado de forma idéntica; difieren únicamente en present
 │       ├── app.js
 │       ├── inicio.js
 │       └── icons.js
+├── data_2026_1/                          ← casos de prueba del profesor
+│   ├── Caso0_20c_10c_5p.txt              ← 20 clientes · 7 cats · 182 records
+│   ├── Caso1_50c_20c_10p.txt             ← 50 clientes · 20 cats · 1 000 records
+│   └── Caso2_100c_30c_40p.txt            ← 100 clientes · 30 cats · 5 000 records
 └── clases/                               ← material de prácticas del curso
 ```
+
+Los casos del profesor usan el formato extendido `'Cat1,Cat2,…,CatN--records'`. El parser de ambas implementaciones lo reconoce automáticamente; el dashboard ofrece además un panel "Casos del profesor" para cargarlos con un click.
 
 ## 3. Cómo correr el proyecto
 
@@ -135,8 +141,9 @@ OK  Ignora records mal formados
 OK  String vacío → salida vacía
 OK  Volumen 10k records sin errores
 OK  Estabilidad: orden determinístico ante empates
+OK  Formato del profesor con prefijo de categorías
 
-10/10 pasaron, 0 fallaron.
+11/11 pasaron, 0 fallaron.
 ```
 
 ### Benchmark
@@ -179,6 +186,7 @@ Contrato:
 | Salida | String con `n` líneas en formato `[a]) customer [totalSpent] [favoriteCategory]`. |
 | Orden | (1) `totalSpent` descendente · (2) `favoriteCategory` descendente · (3) `customer` ascendente. |
 | Robustez | Records mal formados, espacios extra y `;` final se ignoran sin lanzar excepción. |
+| Formato extendido | Acepta el prefijo `'Cat1,Cat2,…,CatN--'` (casos del profesor en `data_2026_1/`). |
 
 ## 5. Algoritmos implementados
 

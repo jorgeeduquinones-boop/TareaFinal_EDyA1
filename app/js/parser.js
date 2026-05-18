@@ -1,10 +1,17 @@
 // =============================================================================
 // parser.js — Parsing del caso de entrada
 // =============================================================================
-// Formato:  record1;record2;...;recordm
-// Cada record:  customer product category price quantity timestamp
+// Formato base (enunciado):
+//   record1;record2;...;recordm
+// Cada record:
+//   customer product category price quantity timestamp
 //
-// Implementación: scan manual carácter a carácter.
+// Formato extendido (casos del profesor):
+//   'Cat1,Cat2,...,CatN--record1;record2;...;recordm'
+//   - comillas simples externas opcionales,
+//   - lista de categorías antes del separador "--".
+//
+// Implementación: scan manual carácter a carácter sobre el cuerpo del caso.
 // Evita crear strings intermedios masivos que dispararía split(';') seguido
 // de split(' ') en cada record. Bajamos asignaciones y presión de GC.
 //
@@ -13,7 +20,33 @@
 // Complejidad espacial:  O(m)  — sólo el array de records resultantes.
 // =============================================================================
 
+// Normaliza el caso de entrada: tolera comillas externas y el formato
+// extendido del profesor con lista de categorías + separador "--".
+// Devuelve { caso, categorias } donde categorias es null si no aparecen.
+function normalizarCaso(caso) {
+  if (typeof caso !== 'string') return { caso: '', categorias: null };
+  let s = caso.trim();
+  if ((s.startsWith("'") && s.endsWith("'")) ||
+      (s.startsWith('"') && s.endsWith('"'))) {
+    s = s.slice(1, -1);
+  }
+  let categorias = null;
+  const idx = s.indexOf('--');
+  if (idx > 0) {
+    const header = s.substring(0, idx);
+    // Sólo tratamos como header de categorías si parece lista CSV
+    // (lleva comas y no contiene separador ';' de records).
+    if (header.indexOf(';') === -1 && header.indexOf(',') !== -1) {
+      categorias = header.split(',').map(c => c.trim()).filter(Boolean);
+      s = s.substring(idx + 2);
+    }
+  }
+  return { caso: s, categorias };
+}
+
 function parsearCaso(caso) {
+  const norm = normalizarCaso(caso);
+  caso = norm.caso;
   const records = [];
   const n = caso.length;
   let i = 0;
@@ -62,6 +95,6 @@ function parsearCaso(caso) {
   return records;
 }
 
-const Parser = { parsearCaso };
+const Parser = { parsearCaso, normalizarCaso };
 if (typeof module !== 'undefined' && module.exports) module.exports = Parser;
 if (typeof window !== 'undefined') window.Parser = Parser;

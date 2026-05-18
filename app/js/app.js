@@ -331,6 +331,61 @@ function leerCsv(file) {
   reader.readAsText(file);
 }
 
+// ============================================================================
+// Casos del profesor: archivos en data_2026_1/ con formato extendido
+// 'Cat1,...,CatN--records'. Se cargan vía fetch desde el repo root.
+// ============================================================================
+const CASOS_PROFESOR = [
+  { id: 'caso0', label: 'Caso 0',  hint: '20 clientes · 7 categorías · 182 records',  file: 'Caso0_20c_10c_5p.txt' },
+  { id: 'caso1', label: 'Caso 1',  hint: '50 clientes · 20 categorías · 1 000 records', file: 'Caso1_50c_20c_10p.txt' },
+  { id: 'caso2', label: 'Caso 2',  hint: '100 clientes · 30 categorías · 5 000 records', file: 'Caso2_100c_30c_40p.txt' },
+];
+
+function renderCasosProfesor() {
+  const cont = document.getElementById('casosProfe');
+  if (!cont) return;
+  cont.innerHTML = CASOS_PROFESOR.map(c => `
+    <button class="prof-case" data-id="${c.id}">
+      <span class="prof-case-title">${c.label}</span>
+      <span class="prof-case-hint">${c.hint}</span>
+    </button>
+  `).join('');
+  cont.querySelectorAll('.prof-case').forEach(btn => {
+    btn.addEventListener('click', () => cargarCasoProfesor(btn.dataset.id));
+  });
+}
+
+async function cargarCasoProfesor(id) {
+  const c = CASOS_PROFESOR.find(x => x.id === id);
+  if (!c) return;
+  const info = document.getElementById('profInfo');
+  info.innerHTML = `<span class="chip">Cargando ${c.label}…</span>`;
+  // Buscamos primero relativo (../data_2026_1/...) y caemos a /data_2026_1/...
+  // como respaldo si el host sirve desde la raíz del repo.
+  const rutas = [`../data_2026_1/${c.file}`, `/data_2026_1/${c.file}`, `data_2026_1/${c.file}`];
+  let texto = null;
+  for (const r of rutas) {
+    try {
+      const res = await fetch(r, { cache: 'no-store' });
+      if (res.ok) { texto = await res.text(); break; }
+    } catch (_) { /* siguiente */ }
+  }
+  if (!texto) {
+    info.innerHTML = `<span class="chip bad">${icon('alert-triangle', 12)} No pude cargar ${c.file}. Sirve el repo desde la raíz (no sólo /app).</span>`;
+    return;
+  }
+  document.getElementById('inputCaso').value = texto;
+  const norm = Parser.normalizarCaso(texto);
+  const records = Parser.parsearCaso(texto);
+  const clientes = new Set(records.map(r => r.customer));
+  info.innerHTML =
+    `<span class="chip good">${icon('check-circle', 12)} ${c.label} cargado.</span> ` +
+    `<strong class="tnum">${fmtNum(records.length)}</strong> records · ` +
+    `<strong class="tnum">${fmtNum(clientes.size)}</strong> clientes · ` +
+    `<strong class="tnum">${norm.categorias ? norm.categorias.length : 0}</strong> categorías declaradas.`;
+  analizar();
+}
+
 function inicializarDropzone() {
   const dz = document.getElementById('dropzone');
   if (!dz) return;
@@ -515,6 +570,7 @@ window.addEventListener('DOMContentLoaded', () => {
   inicializarTabs();
   inicializarDropzone();
   inicializarTests();
+  renderCasosProfesor();
 
   document.getElementById('btnTheme').addEventListener('click', () => {
     aplicarTema(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');

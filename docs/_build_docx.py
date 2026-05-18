@@ -298,12 +298,21 @@ add_para(
     "desde https://tarea-final-e-dy-a1.vercel.app/app/index.html. La app "
     "organiza la solución en cinco paneles: Resultados muestra el ranking "
     "obtenido por calcularPedidos junto con métricas y gráficos; Cargar "
-    "caso permite pegar texto, subir un CSV o generar un caso sintético "
-    "reproducible con (m, n, p, seed); Benchmark contrasta empíricamente "
-    "MergeSort, QuickSort 3-way, RadixSort, Insertion Sort y Array.sort "
-    "nativo sobre el mismo dataset; Pruebas ejecuta la suite "
+    "caso permite pegar texto, subir un CSV, generar un caso sintético "
+    "reproducible con (m, n, p, seed) o cargar con un click los tres "
+    "casos del profesor publicados en data_2026_1/; Benchmark contrasta "
+    "empíricamente MergeSort, QuickSort 3-way, RadixSort, Insertion Sort "
+    "y Array.sort nativo sobre el mismo dataset; Pruebas ejecuta la suite "
     "automatizada; y Documentación reúne el análisis de complejidad y "
     "las decisiones de diseño.",
+    size=11, space_after=4,
+)
+add_para(
+    "Formato extendido del profesor: los archivos en data_2026_1/ tienen "
+    "la forma 'Cat1,Cat2,…,CatN--record1;record2;…;recordm' (lista de "
+    "categorías declaradas antes del separador '--'). El parser de ambas "
+    "implementaciones detecta y procesa este formato sin requerir cambios "
+    "en la firma de calcularPedidos.",
     size=11, space_after=6,
 )
 
@@ -328,6 +337,7 @@ tests = [
     "String vacío produce salida vacía.",
     "Volumen alto: 10 000 records procesados sin desbordar la pila.",
     "Estabilidad: orden determinístico ante empates totales.",
+    "Formato extendido del profesor con prefijo de categorías.",
 ]
 for t in tests:
     p = doc.add_paragraph(style="List Number")
@@ -335,7 +345,7 @@ for t in tests:
     p.add_run(t).font.size = Pt(10.5)
 
 add_para(
-    "Resultado actual: 10/10 pruebas pasan. La integración continua "
+    "Resultado actual: 11/11 pruebas pasan. La integración continua "
     "(.github/workflows/deploy-pages.yml) las ejecuta antes de cada "
     "despliegue, garantizando que sólo versiones verificadas llegan a "
     "producción.",
