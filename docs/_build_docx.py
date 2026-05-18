@@ -147,7 +147,48 @@ resumen = (
     "debe usar algoritmos vistos en clase (Prácticas 4, 5 y 6) y procesar "
     "eficientemente entradas con alto volumen, conservando los términos n, m y p."
 )
-add_para(resumen, size=11, space_after=10)
+add_para(resumen, size=11, space_after=8)
+
+# =============================================================================
+# 1.b VARIABLES Y FLUJO
+# =============================================================================
+add_heading("1.1 Variables y notación", size=12, space_before=4, space_after=3)
+
+vars_t = doc.add_table(rows=5, cols=2)
+vars_t.style = "Light Grid Accent 1"
+vars_t.autofit = False
+vars_t.columns[0].width = Cm(3.0)
+vars_t.columns[1].width = Cm(13.3)
+filas_vars = [
+    ("m", "Número de records de la entrada (m ≥ 5)."),
+    ("n", "Número de clientes únicos en el ranking final (n ≥ 3)."),
+    ("p", "Número de categorías distintas con las que opera el caso."),
+    ("k", "Longitud media de un campo string (acotada en la práctica)."),
+    ("L", "Longitud total del string de entrada ≈ m · k."),
+]
+for i, (k, desc) in enumerate(filas_vars):
+    c0, c1 = vars_t.rows[i].cells
+    rk = c0.paragraphs[0].add_run(k); rk.bold = True; rk.font.name = "Consolas"
+    c1.paragraphs[0].add_run(desc).font.size = Pt(10.5)
+
+add_heading("1.2 Flujo de la función", size=12, space_before=8, space_after=3)
+add_para(
+    "calcularPedidos procesa la entrada en cinco etapas encadenadas. Cada "
+    "etapa toma la salida de la anterior y deja la entrada lista para la "
+    "siguiente, lo que permite analizar la complejidad por fragmento.",
+    size=11, space_after=4,
+)
+
+flow = doc.add_paragraph()
+flow.alignment = WD_ALIGN_PARAGRAPH.CENTER
+flow_run = flow.add_run(
+    "caso  →  [1] Parser  →  [2] Acumulación por cliente  →  "
+    "[3] favoriteCategory  →  [4] QuickSort  →  [5] Formateo  →  salida"
+)
+flow_run.font.name = "Consolas"
+flow_run.font.size = Pt(10)
+flow_run.font.bold = True
+flow.paragraph_format.space_after = Pt(10)
 
 # =============================================================================
 # PSEUDOCÓDIGO + COMPLEJIDADES (tabla a dos columnas)
@@ -276,12 +317,45 @@ add_para(
 # Validación
 add_heading("6. Verificación con el ejemplo del enunciado", size=13, space_before=4, space_after=4)
 add_para(
-    'Para el caso "Customer1 Laptop Technology 3000 1 10;Customer2 Shirt '
-    'Clothing 50 2 12;Customer1 Mouse Technology 100 1 15;Customer2 Shoes '
-    'Clothing 200 1 20;Customer3 TV Technology 2500 1 25", la función '
-    "retorna:",
-    size=11, space_after=2,
+    'Caso de entrada: "Customer1 Laptop Technology 3000 1 10;Customer2 '
+    'Shirt Clothing 50 2 12;Customer1 Mouse Technology 100 1 15;Customer2 '
+    'Shoes Clothing 200 1 20;Customer3 TV Technology 2500 1 25". A '
+    "continuación el estado de los datos al final de cada etapa:",
+    size=11, space_after=4,
 )
+
+walk_t = doc.add_table(rows=6, cols=2)
+walk_t.style = "Light Grid Accent 1"
+walk_t.autofit = False
+walk_t.columns[0].width = Cm(4.0)
+walk_t.columns[1].width = Cm(12.3)
+
+walk_filas = [
+    ("Etapa", "Resultado al terminar"),
+    ("1. Parser",
+     "5 records normalizados: [{Customer1,Laptop,Technology,3000,1,10}, "
+     "{Customer2,Shirt,Clothing,50,2,12}, {Customer1,Mouse,Technology,100,1,15}, "
+     "{Customer2,Shoes,Clothing,200,1,20}, {Customer3,TV,Technology,2500,1,25}]."),
+    ("2. Acumulación",
+     "Customer1 → 3100, cats {Technology:2}; Customer2 → 300, cats {Clothing:2}; "
+     "Customer3 → 2500, cats {Technology:1}."),
+    ("3. favoriteCategory",
+     "Customer1 → Technology; Customer2 → Clothing; Customer3 → Technology."),
+    ("4. QuickSort",
+     "Orden por (totalSpent ↓, favoriteCategory ↓, customer ↑): "
+     "[Customer1 3100 Technology, Customer3 2500 Technology, Customer2 300 Clothing]."),
+    ("5. Formateo",
+     "'1) Customer1 3100 Technology\\n2) Customer3 2500 Technology\\n3) Customer2 300 Clothing'."),
+]
+for i, (et, val) in enumerate(walk_filas):
+    c0, c1 = walk_t.rows[i].cells
+    r0 = c0.paragraphs[0].add_run(et); r0.bold = True; r0.font.size = Pt(10.5)
+    r1 = c1.paragraphs[0].add_run(val); r1.font.size = Pt(10)
+    if i == 0:
+        r0.font.size = Pt(10.5)
+        r1.font.size = Pt(10.5)
+
+add_para("Salida final retornada por calcularPedidos:", size=11, space_after=2)
 ej = doc.add_paragraph()
 ej.paragraph_format.left_indent = Cm(0.8)
 r = ej.add_run("1) Customer1 3100 Technology\n2) Customer3 2500 Technology\n3) Customer2 300 Clothing")
